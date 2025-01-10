@@ -15,6 +15,7 @@ pollster = "0.3.0"
 bytemuck = { version = "1.14.3", features = ["derive"] }
 glyphon = "0.5.0"
 cfg-if = "1"
+ggez = "0.9.3"
 
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
