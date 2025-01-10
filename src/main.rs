@@ -11,7 +11,7 @@
 use ggez::{
     event,
     glam::*,
-    graphics::{self, Color},
+    graphics::{self, Color, Rect},
     Context, GameResult,
 };
 
@@ -22,13 +22,12 @@ struct MainState {
 
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
-        let circle = graphics::Mesh::new_circle(
+        let circle = graphics::Mesh::new_rounded_rectangle(
             ctx,
             graphics::DrawMode::fill(),
-            vec2(0., 0.),
-            100.0,
-            2.0,
-            Color::WHITE,
+            Rect::new(0.0, 0.0, 500.0, 500.0),
+            40.0,
+            Color::WHITE
         )?;
 
         Ok(MainState { pos_x: 0.0, circle })
