@@ -1,0 +1,17 @@
+[package]
+name = "wgpu_test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "wgpu_test"
+path = "src/lib.rs"
+
+[dependencies]
+winit = { version = "0.29", features = ["rwh_05"] }
+env_logger = "0.10"
+log = "0.4"
+wgpu = "22.0"
