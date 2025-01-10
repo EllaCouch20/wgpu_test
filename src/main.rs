@@ -1,11 +1,3 @@
-// use rust_wgpu_gui_example::run;
-
-// fn main() {
-//     pollster::block_on(run());
-// }
-
-
-//! The simplest possible example that does something.
 #![allow(clippy::unnecessary_wraps)]
 
 use ggez::{
@@ -16,7 +8,6 @@ use ggez::{
 };
 
 struct MainState {
-    pos_x: f32,
     circle: graphics::Mesh,
 }
 
@@ -27,16 +18,15 @@ impl MainState {
             graphics::DrawMode::fill(),
             Rect::new(0.0, 0.0, 500.0, 500.0),
             40.0,
-            Color::WHITE
+            Color::WHITE,
         )?;
 
-        Ok(MainState { pos_x: 0.0, circle })
+        Ok(MainState { circle })
     }
 }
 
 impl event::EventHandler<ggez::GameError> for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        self.pos_x = self.pos_x % 800.0 + 1.0;
         Ok(())
     }
 
@@ -44,7 +34,16 @@ impl event::EventHandler<ggez::GameError> for MainState {
         let mut canvas =
             graphics::Canvas::from_frame(ctx, graphics::Color::from([0.1, 0.2, 0.3, 1.0]));
 
-        canvas.draw(&self.circle, Vec2::new(self.pos_x, 380.0));
+        // Get the screen dimensions
+        let screen_size = ctx.gfx.drawable_size();
+        let screen_width = screen_size.0;
+        let screen_height = screen_size.1;
+
+        // Center the rectangle
+        let rect_center_x = screen_width / 2.0 - 250.0; // 250 is half the rectangle's width
+        let rect_center_y = screen_height / 2.0 - 250.0; // 250 is half the rectangle's height
+
+        canvas.draw(&self.circle, Vec2::new(rect_center_x, rect_center_y));
 
         canvas.finish(ctx)?;
 
@@ -57,4 +56,8 @@ pub fn main() -> GameResult {
     let (mut ctx, event_loop) = cb.build()?;
     let state = MainState::new(&mut ctx)?;
     event::run(ctx, event_loop, state)
+}
+
+fn is_in_bounds(rect: Rect, mouse_coords: Mous) -> bool {
+
 }
