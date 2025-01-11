@@ -6,9 +6,9 @@ use ggez::{
     Context, GameResult, GameError, ContextBuilder
 };
 
-pub mod components;
-
+pub mod primitives;
 pub mod traits;
+
 use traits::{Component};
 
 struct State(Box<dyn Component>);
@@ -37,6 +37,7 @@ impl EventHandler<GameError> for State {
     }
 
     fn update(&mut self, ctx: &mut Context) -> GameResult {self.0.update(ctx)}
+
     //TODO: Fill out rest of events
 }
 

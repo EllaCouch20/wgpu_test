@@ -4,7 +4,8 @@ use ggez::{Context, GameResult};
 pub trait Component {
     fn spawn(&self, ctx: &mut Context, drawable: Rect) -> GameResult<Vec<Box<dyn Drawable>>>;
     fn update(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
-    //TODO: fill out rest of events defaulting to no behavior
+    fn on_click(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
+    fn on_hover(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
 }
 
 pub trait Drawable {
