@@ -1,14 +1,14 @@
 use ggez::{
     event,
     event::{EventHandler, EventLoop},
-    glam::*,
-    graphics::{self, Rect, Canvas, DrawParam},
+    graphics::{self, Rect, Canvas},
     Context, GameResult, GameError, ContextBuilder
 };
 
-pub mod components;
-
+pub mod primitives;
+pub mod structs;
 pub mod traits;
+
 use traits::{Component};
 
 struct State(Box<dyn Component>);
@@ -27,16 +27,16 @@ impl EventHandler<GameError> for State {
         let bound = Rect::new(10.0, 10.0, screen_width-20.0, screen_height-20.0);
 
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::from([0.1, 0.2, 0.3, 1.0]));
-        for (item, bound) in self.0.spawn(ctx, bound)? {
-            let param: DrawParam = Vec2::new(bound.x, bound.y).into();
-            canvas.set_scissor_rect(bound)?;
-            item.draw(&mut canvas, param);
+        for spawned in self.0.spawn(ctx, bound)? {
+            canvas.set_scissor_rect(spawned.bound)?;
+            spawned.drawable.draw(&mut canvas, spawned.param);
         }
         canvas.finish(ctx)?;
         Ok(())
     }
 
     fn update(&mut self, ctx: &mut Context) -> GameResult {self.0.update(ctx)}
+
     //TODO: Fill out rest of events
 }
 

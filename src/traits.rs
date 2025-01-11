@@ -1,18 +1,21 @@
 use ggez::graphics::{Rect, Canvas, DrawParam};
 use ggez::{Context, GameResult};
+use crate::structs::SpawnResult;
+use std::fmt::Debug;
 
 pub trait Component {
-    fn spawn(&self, ctx: &mut Context, bound: Rect) -> GameResult<Vec<(Box<dyn Drawable>, Rect)>>;
+    fn spawn(&self, ctx: &mut Context, bound: Rect) -> SpawnResult;
     fn update(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
-    //TODO: fill out rest of events defaulting to no behavior
+    fn on_click(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
+    fn on_hover(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
 }
 
-pub trait Drawable {
+pub trait Drawable: Debug {
     fn draw(&self, canvas: &mut Canvas, param: DrawParam);
     fn dimensions(&self, gfx: &Context) -> Option<Rect>;
 }
 
-impl<T: ggez::graphics::Drawable> Drawable for T {
+impl<T: ggez::graphics::Drawable + Debug> Drawable for T {
     fn draw(&self, canvas: &mut Canvas, param: DrawParam) {
         ggez::graphics::Drawable::draw(self, canvas, param)
     }
