@@ -25,10 +25,10 @@ impl EventHandler<GameError> for State {
         let screen_width = screen_size.0;
         let screen_height = screen_size.1;
         let bound = Rect::new(10.0, 10.0, screen_width-20.0, screen_height-20.0);
-        let param: DrawParam = Vec2::new(bound.x, bound.y).into();
 
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::from([0.1, 0.2, 0.3, 1.0]));
-        for item in self.0.spawn(ctx, bound)? {
+        for (item, bound) in self.0.spawn(ctx, bound)? {
+            let param: DrawParam = Vec2::new(bound.x, bound.y).into();
             canvas.set_scissor_rect(bound)?;
             item.draw(&mut canvas, param);
         }

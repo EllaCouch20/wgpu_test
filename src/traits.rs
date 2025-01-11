@@ -2,7 +2,7 @@ use ggez::graphics::{Rect, Canvas, DrawParam};
 use ggez::{Context, GameResult};
 
 pub trait Component {
-    fn spawn(&self, ctx: &mut Context, drawable: Rect) -> GameResult<Vec<Box<dyn Drawable>>>;
+    fn spawn(&self, ctx: &mut Context, bound: Rect) -> GameResult<Vec<(Box<dyn Drawable>, Rect)>>;
     fn update(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
     //TODO: fill out rest of events defaulting to no behavior
 }

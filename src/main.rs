@@ -3,6 +3,6 @@ use ramp_ds::components::*;
 
 pub fn main() {
     Runtime::new(
-        Stack(vec![Box::new(ABox(0.2, 0.3)), Box::new(ABox(0.5, 0.1))])
+        Column(vec![Box::new(ABox(200.0, 300.0)), Box::new(ABox(500.0, 100.0))], 32.0)
     ).unwrap().run().unwrap()
 }
