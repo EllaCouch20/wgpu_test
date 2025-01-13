@@ -1,26 +1,43 @@
 use ggez::graphics::{Rect, Canvas, DrawParam};
 use ggez::{Context, GameResult};
-use crate::structs::SpawnResult;
+use ggez::glam::Vec2;
 use std::fmt::Debug;
+use crate::structs::Component;
+use dyn_clone::{DynClone, clone_trait_object};
 
-pub trait Component {
-    fn spawn(&self, ctx: &mut Context, bound: Rect) -> SpawnResult;
+pub trait ComponentBuilder: Debug + DynClone {
+    fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component>;
     fn update(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
     fn on_click(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
     fn on_hover(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
 }
+clone_trait_object!(ComponentBuilder);
 
-pub trait Drawable: Debug {
-    fn draw(&self, canvas: &mut Canvas, param: DrawParam);
-    fn dimensions(&self, gfx: &Context) -> Option<Rect>;
+impl<C: ComponentBuilder + 'static> From<C> for Box<dyn ComponentBuilder> {
+    fn from(builder: C) -> Self {
+        Box::new(builder)
+    }
 }
 
-impl<T: ggez::graphics::Drawable + Debug> Drawable for T {
-    fn draw(&self, canvas: &mut Canvas, param: DrawParam) {
-        ggez::graphics::Drawable::draw(self, canvas, param)
+pub trait Drawable: Debug + DynClone {
+    fn draw(&self, canvas: &mut Canvas, bound: Rect);
+    fn size(&self, ctx: &Context) -> Vec2;
+}
+clone_trait_object!(Drawable);
+
+impl<T: ggez::graphics::Drawable + Debug + Clone> Drawable for T {
+    fn draw(&self, canvas: &mut Canvas, bound: Rect) {
+        if bound.w > 0.0 && bound.h > 0.0 {
+            println!("boNd: {:?}", bound);
+            canvas.set_scissor_rect(bound).unwrap();
+            ggez::graphics::Drawable::draw(self, canvas, Vec2::new(bound.x, bound.y))
+        }
     }
-    fn dimensions(&self, gfx: &Context) -> Option<Rect> {
-        ggez::graphics::Drawable::dimensions(self, gfx)
+
+    //Offset built into the drawable is included in its size
+    fn size(&self, ctx: &Context) -> Vec2 {
+        let rect = ggez::graphics::Drawable::dimensions(self, ctx).unwrap();
+        Vec2::new(rect.w+rect.x, rect.h+rect.y)
     }
 }
 

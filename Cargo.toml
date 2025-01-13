@@ -4,4 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+dyn-clone = "1.0.17"
+either = "1.13.0"
+float-ord = "0.3.2"
 ggez = "0.9.3"
+log = "0.4.24"
