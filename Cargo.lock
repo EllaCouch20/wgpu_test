@@ -1876,10 +1876,12 @@ dependencies = [
 name = "ramp-ds"
 version = "0.1.0"
 dependencies = [
+ "ab_glyph",
  "dyn-clone",
  "either",
  "float-ord",
  "ggez",
+ "glyph_brush",
  "log",
 ]
 

@@ -1,27 +1,17 @@
-use ggez::graphics::{Color, Rect, Text, TextFragment, PxScale, Image};
+use ggez::graphics::{Color, Rect, Text, TextFragment, Image};
 use ggez::{Context};
 use crate::primitives::*;
-use crate::traits::{Drawable};
 use crate::Vec2;
 use crate::ComponentBuilder;
-use crate::GameResult;
-use crate::graphics::Mesh;
-use crate::graphics::DrawMode;
 use crate::structs::{BuildResult, px};
-
-use crate::theme::color::{
-    ButtonColors,
-    ButtonSchemes,
-    hex,
-};
+use crate::theme::*;
 
 #[derive(Debug, Clone)]
 pub struct Button(pub ButtonStyle, pub Size, pub &'static str);
 
 impl ComponentBuilder for Button {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-        let palette = ButtonColors::new(ButtonSchemes::default());
-        let colors = palette.colors_from(self.0, ButtonState::Default);
+        let colors = palette().button.colors_from(self.0, ButtonState::Default);
 
         let (text_size, height) = match self.1 {
             Size::Medium => (32.0, px(ctx, 32.0)),
@@ -53,7 +43,7 @@ impl ComponentBuilder for Button {
             ),
             (
                 Image::from_path(ctx, "/profile_picture.png")?,
-                Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y)
+                Rect::new(0.0, 0.0, 50.0, 50.0)
             )
         ]
     }
@@ -102,7 +92,7 @@ impl ComponentBuilder for CustomText {
             Text::new(
                 TextFragment {
                     text: self.0.to_string(),
-                    scale: Some(PxScale::from(self.1)),
+                    scale: Some(self.1.into()),
                     font: Some("Label".into()),
                     color: Some(Color::WHITE)
                 }

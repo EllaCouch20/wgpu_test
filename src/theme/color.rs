@@ -35,13 +35,7 @@ impl ColorResources {
         text: TextColor,
         button: ButtonColors,
     ) -> Self {
-        ColorResources {
-            background,
-            outline,
-            status,
-            text,
-            button,
-        }
+        ColorResources { background, outline, status, text, button }
     }
 }
 

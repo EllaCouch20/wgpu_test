@@ -15,6 +15,8 @@ pub mod structs;
 pub mod traits;
 pub mod theme;
 
+use theme::*;
+
 use traits::{ComponentBuilder};
 
 struct State(Box<dyn ComponentBuilder>);
@@ -30,19 +32,7 @@ impl EventHandler<GameError> for State {
         let screen_size = ctx.gfx.drawable_size();
         let screen_width = screen_size.0;
         let screen_height = screen_size.1;
-
-        ctx.gfx.add_font(
-            "Label",
-            graphics::FontData::from_path(ctx, "/outfit_bold.ttf")?,
-        );
-        ctx.gfx.add_font(
-            "Heading",
-            graphics::FontData::from_path(ctx, "/outfit_bold.ttf")?,
-        );
-        ctx.gfx.add_font(
-            "Text",
-            graphics::FontData::from_path(ctx, "/outfit_regular.ttf")?,
-        );
+        let _fonts = load_fonts(ctx);
 
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::BLACK);
 
