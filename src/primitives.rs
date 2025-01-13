@@ -32,6 +32,8 @@ impl ComponentBuilder for Rectangle {
     }
 }
 
+
+
 // #[derive(Debug, Clone)]
 // pub struct BorderedRectangle(pub f32, pub f32, );
 
@@ -95,6 +97,22 @@ impl ComponentBuilder for ExtRectangle {
 //          Ok(Component::from(self.0.clone()))
 //      }
 //  }
+
+#[derive(Debug, Clone)]
+pub struct Center<C: ComponentBuilder + Clone>(pub C);
+
+impl<C: ComponentBuilder + Clone> ComponentBuilder for Center<C> {
+    fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+        let component = self.0.build(ctx, Vec2::new(size.x, size.y))?;
+        let c_size = component.size(ctx);
+        Ok(Component::from(vec![
+            (
+                component,
+                Rect::new((size.x-c_size.x)/2.0, (size.y-c_size.y)/2.0, size.x, size.y)
+            )
+        ]))
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Container<C: ComponentBuilder + Clone>(pub C, pub f32, pub f32);

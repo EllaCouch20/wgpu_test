@@ -45,7 +45,7 @@ impl EventHandler<GameError> for State {
         );
 
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::BLACK);
-        
+
         let bound = Rect::new(10.0, 10.0, screen_width-20.0, screen_height-20.0);
         self.0.build(ctx, Vec2::new(screen_width-20.0, screen_height-20.0))?.draw(&mut canvas, bound);
         canvas.finish(ctx)?;

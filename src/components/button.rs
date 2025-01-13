@@ -30,9 +30,6 @@ impl ComponentBuilder for Button {
             Size::Large => (48.0, px(48.0))
         };
 
-        let text = ;
-        println!("size: {:?}", text.size(ctx));
-
         Ok(Component::from(vec![
             (
                 Rectangle {
@@ -44,7 +41,7 @@ impl ComponentBuilder for Button {
                 Rect::new(0.0, 0.0, size.x, size.y)
             ),
             (
-                Center(CustomText("Continue", text_size)).build(ctx, size)?,
+                Center(CustomText("Continue", text_size)).build(ctx, Vec2::new(size.x, height))?,
                 Rect::new(0.0, 0.0, size.x, size.y),
             )
         ]))
