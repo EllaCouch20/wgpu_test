@@ -8,7 +8,12 @@ use std::fmt::Debug;
 pub use crate::Column;
 
 #[derive(Debug, Clone)]
-pub struct Rectangle(pub f32, pub f32);
+pub struct Rectangle {
+    pub width: f32, 
+    pub height: f32,
+    pub color: Color,
+    pub radius: f32,
+}
 
 impl ComponentBuilder for Rectangle {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
@@ -17,15 +22,45 @@ impl ComponentBuilder for Rectangle {
                 Mesh::new_rounded_rectangle(
                     ctx,
                     DrawMode::fill(),
-                    Rect::new(0.0, 0.0, self.0*size.x, self.1*size.y),
-                    40.0,
-                    Color::WHITE,
+                    Rect::new(0.0, 0.0, self.width, self.height),
+                    self.radius,
+                    self.color,
                 )?,
-                Rect::new(20.0, 20.0, size.x, size.y)
+                Rect::new(0.0, 0.0, size.x, size.y)
             )
         ]))
     }
 }
+
+// #[derive(Debug, Clone)]
+// pub struct BorderedRectangle(pub f32, pub f32, );
+
+// impl ComponentBuilder for BorderedRectangle {
+//     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+//         Ok(Component::from(vec![
+//             (
+//                 Mesh::new_rounded_rectangle(
+//                     ctx,
+//                     DrawMode::fill(),
+//                     Rect::new(0.0, 0.0, self.0*size.x, self.1*size.y),
+//                     40.0,
+//                     Color::WHITE,
+//                 )?,
+//                 Rect::new(20.0, 20.0, size.x, size.y)
+//             )
+//             (
+//                 Mesh::new_rounded_rectangle(
+//                     ctx,
+//                     DrawMode::fill(),
+//                     Rect::new(0.0, 0.0, self.0*size.x, self.1*size.y),
+//                     40.0,
+//                     Color::WHITE,
+//                 )?,
+//                 Rect::new(20.0, 20.0, size.x, size.y)
+//             )
+//         ]))
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub struct ExtRectangle(pub f32, pub f32);
