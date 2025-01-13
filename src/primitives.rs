@@ -5,6 +5,8 @@ use crate::traits::ComponentBuilder;
 use crate::structs::Component;
 use std::fmt::Debug;
 
+pub use crate::Column;
+
 #[derive(Debug, Clone)]
 pub struct Rectangle(pub f32, pub f32);
 

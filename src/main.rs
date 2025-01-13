@@ -1,5 +1,4 @@
 use ramp_ds::Runtime;
-use ramp_ds::Column;
 use ramp_ds::primitives::*;
 
 pub fn main() {
