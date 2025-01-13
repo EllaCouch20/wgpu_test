@@ -1,8 +1,8 @@
-use ggez::graphics::{Color, DrawMode, Mesh, Rect};
+use ggez::graphics::{Color, DrawMode, Mesh, Rect, Image};
 use ggez::{Context, GameResult};
 use ggez::glam::Vec2;
 use crate::traits::ComponentBuilder;
-use crate::structs::{Component, min, max};
+use crate::structs::{Component, min, max, px};
 use std::fmt::Debug;
 
 pub use crate::{Column, build};
@@ -12,17 +12,29 @@ pub struct Rectangle {
     pub width: f32, 
     pub height: f32,
     pub color: Color,
+    pub stroke: Color,
     pub radius: f32,
 }
 
 impl ComponentBuilder for Rectangle {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+        let stroke = px(ctx, 1.0);
         build![
             (
                 Mesh::new_rounded_rectangle(
                     ctx,
                     DrawMode::fill(),
                     Rect::new(0.0, 0.0, self.width, self.height),
+                    self.radius,
+                    self.stroke,
+                )?,
+                Rect::new(0.0, 0.0, size.x, size.y)
+            ),
+            (
+                Mesh::new_rounded_rectangle(
+                    ctx,
+                    DrawMode::fill(),
+                    Rect::new(stroke, stroke, self.width - stroke * 2., self.height - stroke * 2.),
                     self.radius,
                     self.color,
                 )?,
@@ -172,6 +184,18 @@ impl<V: Into<Box<dyn ComponentBuilder>>> From<Vec<V>> for Column {
     }
 }
 
+// let image = Image::from_path(ctx, "/profile_picture.png")?;
+
+// #[derive(Debug, Clone)]
+// pub struct Img(pub &'static str);
+
+// impl ComponentBuilder for Img {
+//     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+//         Ok(Component::from(
+//             Image::from_path(ctx, self.0)
+//         ))
+//     }
+// }
 
 //  //  pub struct Stack(pub Vec<Box<dyn Component>>);
 

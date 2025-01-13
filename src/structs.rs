@@ -12,6 +12,11 @@ pub fn max(x: f32, y: f32) -> f32 {
     std::cmp::max(x as i32, y as i32) as f32
 }
 
+pub fn px(ctx: &mut Context, a: f32) -> f32 {
+    let scale_factor = ctx.gfx.window().scale_factor(); // DPI scale factor
+    a * scale_factor as f32
+}
+
 #[derive(Clone, Debug)]
 pub struct Child(Either<Box<dyn Drawable>, Component>, Rect);
 

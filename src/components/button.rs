@@ -7,7 +7,7 @@ use crate::ComponentBuilder;
 use crate::GameResult;
 use crate::graphics::Mesh;
 use crate::graphics::DrawMode;
-use crate::structs::Component;
+use crate::structs::{Component, px};
 
 use crate::theme::color::{
     ButtonColors,
@@ -15,14 +15,12 @@ use crate::theme::color::{
     hex,
 };
 
-
 #[derive(Debug, Clone)]
-pub struct Button(pub ButtonStyle, pub Size);
+pub struct Button(pub ButtonStyle, pub Size, pub &'static str);
 
 impl ComponentBuilder for Button {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
         let palette = ButtonColors::new(ButtonSchemes::default());
-
         let colors = palette.colors_from(self.0, ButtonState::Default);
 
         let (text_size, height) = match self.1 {
@@ -30,23 +28,69 @@ impl ComponentBuilder for Button {
             Size::Large => (48.0, px(ctx, 48.0))
         };
 
-        Ok(Component::from(vec![
+        let label = CustomText(self.2, text_size).build(ctx, size)?;
+        let label_size = label.size(ctx);
+
+        let width = match self.1 {
+            Size::Medium => label_size.x + 48.0,
+            Size::Large => size.x
+        };
+
+        build![
             (
                 Rectangle {
                     height,
-                    width: size.x,
+                    width,
                     radius: 50.0,
+                    stroke: colors.outline,
                     color: colors.background,
                 }.build(ctx, size)?,
                 Rect::new(0.0, 0.0, size.x, size.y)
             ),
             (
-                Center(CustomText("Continue", text_size)).build(ctx, Vec2::new(size.x, height))?,
-                Rect::new(0.0, 0.0, size.x, size.y),
+                label,
+                Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y)
+            ),
+            (
+                Image::from_path(ctx, "profile_picture.png")?,
+                Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y)
             )
-        ]))
+        ]
     }
 }
+
+// #[derive(Debug, Clone)]
+// pub struct Button(pub ButtonStyle, pub Size);
+
+// impl ComponentBuilder for Button {
+//     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+//         let palette = ButtonColors::new(ButtonSchemes::default());
+
+//         let colors = palette.colors_from(self.0, ButtonState::Default);
+
+//         let (text_size, height) = match self.1 {
+//             Size::Medium => (32.0, px(ctx, 32.0)),
+//             Size::Large => (48.0, px(ctx, 48.0))
+//         };
+
+//         Ok(Component::from(vec![
+//             (
+//                 Rectangle {
+//                     height,
+//                     width: size.x,
+//                     radius: 50.0,
+//                     stroke: colors.outline,
+//                     color: colors.background,
+//                 }.build(ctx, size)?,
+//                 Rect::new(0.0, 0.0, size.x, size.y)
+//             ),
+//             (
+//                 Center(CustomText("Continue", text_size)).build(ctx, Vec2::new(size.x, height))?,
+//                 Rect::new(0.0, 0.0, size.x, size.y),
+//             )
+//         ]))
+//     }
+// }
 
 
 #[derive(Clone, Debug)]
@@ -152,14 +196,6 @@ impl ComponentBuilder for CustomText {
 //     }
 // }
 
-pub fn px(ctx: &mut Context, a: f32) -> f32 {
-    let scale_factor = ctx.gfx.window().scale_factor(); // DPI scale factor
-    // let (logical_width, logical_height) = ctx.gfx.drawable_size();
-    // let physical_width = logical_width * scale_factor as f32;
-    // let physical_height = logical_height * scale_factor as f32;
-
-    a * scale_factor as f32
-}
 
 #[derive(Eq, Hash, PartialEq, Clone, Copy, Debug)]
 pub enum ButtonStyle {

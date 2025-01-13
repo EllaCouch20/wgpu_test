@@ -5,10 +5,13 @@ use ramp_ds::components::*;
 pub fn main() {
     Runtime::new(
         Column!(
-            0.0,
-            Button(ButtonStyle::Primary, Size::Large),
-            Container(ExtRectangle(200.0, 300.0), 0.4, 0.2),
-            ExtRectangle(500.0, 100.0)
+            24.0,
+            Button(ButtonStyle::Primary, Size::Medium, "Continue"),
+            Button(ButtonStyle::Primary, Size::Large, "Continue"),
+            Button(ButtonStyle::Secondary, Size::Medium, "Continue"),
+            Button(ButtonStyle::Secondary, Size::Large, "Continue"),
+            Button(ButtonStyle::Ghost, Size::Medium, "Continue"),
+            Button(ButtonStyle::Ghost, Size::Large, "Continue")
         )
     ).unwrap().run().unwrap()
 }
