@@ -3,6 +3,7 @@ use ggez::{Context, GameResult};
 use ggez::glam::Vec2;
 use crate::traits::ComponentBuilder;
 use crate::structs::Component;
+use crate::components::*;
 use std::fmt::Debug;
 
 pub use crate::Column;
@@ -18,6 +19,7 @@ pub struct Rectangle {
 
 impl ComponentBuilder for Rectangle {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+        let stroke = px(ctx, 1.0);
         Ok(Component::from(vec![
             (
                 Mesh::new_rounded_rectangle(
@@ -25,17 +27,17 @@ impl ComponentBuilder for Rectangle {
                     DrawMode::fill(),
                     Rect::new(0.0, 0.0, self.width, self.height),
                     self.radius,
-                    self.color,
+                    self.stroke,
                 )?,
                 Rect::new(0.0, 0.0, size.x, size.y)
             ),
             (
                 Mesh::new_rounded_rectangle(
                     ctx,
-                    DrawMode::stroke(2.0),
-                    Rect::new(0.0, 0.0, self.width, self.height),
+                    DrawMode::fill(),
+                    Rect::new(stroke, stroke, self.width - stroke * 2., self.height - stroke * 2.),
                     self.radius,
-                    self.stroke,
+                    self.color,
                 )?,
                 Rect::new(0.0, 0.0, size.x, size.y)
             )
