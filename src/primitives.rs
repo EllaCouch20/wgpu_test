@@ -2,10 +2,10 @@ use ggez::graphics::{Color, DrawMode, Mesh, Rect};
 use ggez::{Context, GameResult};
 use ggez::glam::Vec2;
 use crate::traits::ComponentBuilder;
-use crate::structs::Component;
+use crate::structs::{Component, min, max};
 use std::fmt::Debug;
 
-pub use crate::Column;
+pub use crate::{Column, build};
 
 #[derive(Debug, Clone)]
 pub struct Rectangle {
@@ -17,7 +17,7 @@ pub struct Rectangle {
 
 impl ComponentBuilder for Rectangle {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
-        Ok(Component::from(vec![
+        build![
             (
                 Mesh::new_rounded_rectangle(
                     ctx,
@@ -28,8 +28,15 @@ impl ComponentBuilder for Rectangle {
                 )?,
                 Rect::new(0.0, 0.0, size.x, size.y)
             )
-        ]))
+        ]
     }
+}
+
+#[macro_export]
+macro_rules! build {
+    [$(($i:expr, $x:expr)),*] => {{
+        Ok(Component(vec![$(($i, $x).into()),*]))
+    }}
 }
 
 
@@ -219,3 +226,30 @@ impl<V: Into<Box<dyn ComponentBuilder>>> From<Vec<V>> for Column {
 
 //      fn update(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
 //  }
+
+#[derive(Debug, Clone)]
+pub struct Scrollable<C: ComponentBuilder + Clone>(pub C, pub f32);
+
+impl<C: ComponentBuilder + Clone> ComponentBuilder for Scrollable<C> {
+    fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+        let component = self.0.build(ctx, size)?;
+        let scroll = max(max(0.0, size.y-component.size(ctx).y), self.1);
+        Ok(Component::from(vec![
+            (component, Rect::new(0.0, -scroll, size.x, size.y))
+        ]))
+    }
+//  fn spawn(&self, ctx: &mut Context, mut bound: Rect) -> SpawnResult {
+//      let mut children = self.component.spawn(ctx, bound)?;
+//      let content_height = children.iter().fold(0, |height, c| {let rect = c.drawable.dimensions(ctx).unwrap(); std::cmp::max(height, (rect.y + rect.h) as u32)});
+//      let max_scroll = std::cmp::max(0, content_height-bound.h as u32);
+//      let scroll = std::cmp::min(max_scroll, self.scroll as u32);
+
+//      children.iter_mut().for_each(|s| match s.param.transform {
+//          Transform::Values{dest, ..} => {
+//              s.param = s.param.dest(Vec2::new(dest.x, dest.y-scroll as f32));
+//          },
+//          _ => {}
+//      });
+//      Ok(children)
+//  }
+}

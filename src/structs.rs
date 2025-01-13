@@ -52,13 +52,9 @@ impl From<(Component, Rect)> for Child {
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct Component(Vec<Child>);
+pub struct Component(pub Vec<Child>);
 
 impl Component {
-    pub fn new() -> Self {
-        Component(Vec::default())
-    }
-
     pub fn size(&self, ctx: &Context) -> Vec2 {
         self.0.iter().fold(Vec2::new(0.0, 0.0), |old_size, c| {
             let size = c.size(ctx);
