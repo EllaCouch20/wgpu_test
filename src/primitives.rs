@@ -1,4 +1,4 @@
-use ggez::graphics::{Color, DrawMode, Mesh, Rect};
+use ggez::graphics::{Color, DrawMode, Mesh, Rect, Image};
 use ggez::{Context, GameResult};
 use ggez::glam::Vec2;
 use crate::traits::ComponentBuilder;
@@ -44,38 +44,6 @@ impl ComponentBuilder for Rectangle {
         ]))
     }
 }
-
-
-
-// #[derive(Debug, Clone)]
-// pub struct BorderedRectangle(pub f32, pub f32, );
-
-// impl ComponentBuilder for BorderedRectangle {
-//     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
-//         Ok(Component::from(vec![
-//             (
-//                 Mesh::new_rounded_rectangle(
-//                     ctx,
-//                     DrawMode::fill(),
-//                     Rect::new(0.0, 0.0, self.0*size.x, self.1*size.y),
-//                     40.0,
-//                     Color::WHITE,
-//                 )?,
-//                 Rect::new(20.0, 20.0, size.x, size.y)
-//             )
-//             (
-//                 Mesh::new_rounded_rectangle(
-//                     ctx,
-//                     DrawMode::fill(),
-//                     Rect::new(0.0, 0.0, self.0*size.x, self.1*size.y),
-//                     40.0,
-//                     Color::WHITE,
-//                 )?,
-//                 Rect::new(20.0, 20.0, size.x, size.y)
-//             )
-//         ]))
-//     }
-// }
 
 #[derive(Debug, Clone)]
 pub struct ExtRectangle(pub f32, pub f32);
@@ -178,6 +146,18 @@ impl<V: Into<Box<dyn ComponentBuilder>>> From<Vec<V>> for Column {
     }
 }
 
+// let image = Image::from_path(ctx, "/profile_picture.png")?;
+
+// #[derive(Debug, Clone)]
+// pub struct Img(pub &'static str);
+
+// impl ComponentBuilder for Img {
+//     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+//         Ok(Component::from(
+//             Image::from_path(ctx, self.0)
+//         ))
+//     }
+// }
 
 //  //  pub struct Stack(pub Vec<Box<dyn Component>>);
 

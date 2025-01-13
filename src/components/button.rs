@@ -21,7 +21,6 @@ pub struct Button(pub ButtonStyle, pub Size, pub &'static str);
 impl ComponentBuilder for Button {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
         let palette = ButtonColors::new(ButtonSchemes::default());
-
         let colors = palette.colors_from(self.0, ButtonState::Default);
 
         let (text_size, height) = match self.1 {
@@ -50,6 +49,10 @@ impl ComponentBuilder for Button {
             ),
             (
                 label,
+                Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y),
+            ),
+            (
+                Image::from_path(ctx, "profile_picture.png")?,
                 Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y),
             )
         ]))
