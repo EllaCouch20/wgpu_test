@@ -1,4 +1,4 @@
-use ggez::graphics::{Rect, Canvas, DrawParam};
+use ggez::graphics::{Rect, Canvas};
 use ggez::{Context, GameResult};
 use ggez::glam::Vec2;
 use std::fmt::Debug;
@@ -28,7 +28,6 @@ clone_trait_object!(Drawable);
 impl<T: ggez::graphics::Drawable + Debug + Clone> Drawable for T {
     fn draw(&self, canvas: &mut Canvas, bound: Rect) {
         if bound.w > 0.0 && bound.h > 0.0 {
-            println!("boNd: {:?}", bound);
             canvas.set_scissor_rect(bound).unwrap();
             ggez::graphics::Drawable::draw(self, canvas, Vec2::new(bound.x, bound.y))
         }

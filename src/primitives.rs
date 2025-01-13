@@ -85,7 +85,6 @@ impl ComponentBuilder for Column {
             self.0.clone().into_iter().map(|mut builder| {
                 let child = builder.build(ctx, Vec2::new(bound.w, bound.h))?;
                 let height = child.size(ctx).y;
-                println!("boundd: {:?}", bound);
                 let res = (child, bound);
                 bound.h -= height as f32;
                 bound.y += self.1 + height as f32;
@@ -95,11 +94,21 @@ impl ComponentBuilder for Column {
     }
 }
 
-//  impl<V: Into<Box<dyn ComponentBuilder>>> From<Vec<V>> for Column {
-//      fn from(v: Vec<V>) -> Self {
-//          Column(v.into_iter().map(|v| v.into()).collect(), 32.0)
-//      }
-//  }
+#[macro_export]
+macro_rules! Column {
+    ($x:literal, $($i:expr),*) => {{
+        Column(vec![
+            $(Box::new($i) as Box<dyn ramp_ds::traits::ComponentBuilder>),*
+        ], $x)
+    }}
+}
+
+
+impl<V: Into<Box<dyn ComponentBuilder>>> From<Vec<V>> for Column {
+    fn from(v: Vec<V>) -> Self {
+        Column(v.into_iter().map(|v| v.into()).collect(), 32.0)
+    }
+}
 
 
 //  //  pub struct Stack(pub Vec<Box<dyn Component>>);

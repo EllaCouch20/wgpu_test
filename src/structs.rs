@@ -17,17 +17,16 @@ pub struct Child(Either<Box<dyn Drawable>, Component>, Rect);
 
 impl Child {
     pub fn size(&self, ctx: &Context) -> Vec2 {
-        match &self.0 {
+        let size = match &self.0 {
             Either::Left(drawable) => drawable.size(ctx),
             Either::Right(component) => component.size(ctx)
-        }
+        };
+        Vec2::new(min(size.x, self.1.w), min(size.y, self.1.h))
     }
 
     pub fn offset(&self) -> Vec2 {Vec2::new(self.1.x, self.1.y)}
 
     pub fn draw(&self, canvas: &mut Canvas, bound: Rect) {
-        println!("bound: {:?}", bound);
-        println!("offset: {:?}", self.1);
         let bound = Rect::new(
             bound.x+self.1.x, bound.y+self.1.y,
             min(bound.w-self.1.x, self.1.w), min(bound.h-self.1.y, self.1.h)
