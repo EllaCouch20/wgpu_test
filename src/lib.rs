@@ -143,7 +143,11 @@ impl Runtime {
         };
     
         let (ctx, event_loop) = ContextBuilder::new("super_simple", "ggez")
-            .window_setup(WindowSetup::default().title("RampDS"))
+            .window_setup(
+                WindowSetup::default()
+                    .title("RampDS")
+                    .samples(ggez::conf::NumSamples::Four)
+            )
             .window_mode(
                 WindowMode::default()
                     .dimensions(1440.0, 780.0)
