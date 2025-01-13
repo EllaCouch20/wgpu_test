@@ -36,7 +36,7 @@ impl ComponentBuilder for Button {
             Size::Large => size.x
         };
 
-        build![
+        Component![
             (
                 Rectangle {
                     height,
@@ -98,7 +98,7 @@ pub struct CustomText(&'static str, f32);
 
 impl ComponentBuilder for CustomText {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
-        Ok(Component::from(vec![(
+        Component![(
             Text::new(
                 TextFragment {
                     text: self.0.to_string(),
@@ -108,7 +108,7 @@ impl ComponentBuilder for CustomText {
                 }
             ),
             Rect::new(0.0, 0.0, size.x, size.y)
-        )]))
+        )]
     }
 }
 

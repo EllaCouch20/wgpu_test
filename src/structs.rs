@@ -1,5 +1,5 @@
 use ggez::graphics::{Canvas, Rect};
-use ggez::Context;
+use ggez::{GameResult, Context};
 use ggez::glam::Vec2;
 use crate::traits::Drawable;
 use either::Either;
@@ -56,6 +56,8 @@ impl From<(Component, Rect)> for Child {
     }
 }
 
+pub type BuildResult = GameResult<Component>;
+
 #[derive(Clone, Debug, Default)]
 pub struct Component(pub Vec<Child>);
 
@@ -75,8 +77,9 @@ impl Component {
     }
 }
 
-impl<V: Into<Child>> From<Vec<V>> for Component {
-    fn from(v: Vec<V>) -> Self {
-        Component(v.into_iter().map(|v| v.into()).collect())
-    }
+#[macro_export]
+macro_rules! Component {
+    [$(($i:expr, $x:expr)),*] => {{
+        Ok(crate::structs::Component(vec![$(($i, $x).into()),*]))
+    }}
 }
