@@ -36,6 +36,7 @@ impl ComponentBuilder for Button {
                     height,
                     width: size.x,
                     radius: 50.0,
+                    stroke: colors.outline,
                     color: colors.background,
                 }.build(ctx, size)?,
                 Rect::new(0.0, 0.0, size.x, size.y)
@@ -159,6 +160,15 @@ pub fn px(ctx: &mut Context, a: f32) -> f32 {
     // let physical_height = logical_height * scale_factor as f32;
 
     a * scale_factor as f32
+}
+
+pub fn fs(ctx: &mut Context, a: f32) -> f32 {
+    let scale_factor = ctx.gfx.window().scale_factor(); // DPI scale factor
+    // let (logical_width, logical_height) = ctx.gfx.drawable_size();
+    // let physical_width = logical_width * scale_factor as f32;
+    // let physical_height = logical_height * scale_factor as f32;
+
+    a / scale_factor as f32
 }
 
 #[derive(Eq, Hash, PartialEq, Clone, Copy, Debug)]
