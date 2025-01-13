@@ -1,8 +1,9 @@
 use ggez::graphics::{Canvas, Rect};
 use ggez::{GameResult, Context};
-use ggez::glam::Vec2;
 use crate::traits::Drawable;
 use either::Either;
+
+pub use ggez::glam::Vec2;
 
 pub fn min(x: f32, y: f32) -> f32 {
     std::cmp::min(x as i32, y as i32) as f32
