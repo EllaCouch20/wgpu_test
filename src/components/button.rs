@@ -18,7 +18,7 @@ impl ComponentBuilder for Button {
             Size::Large => (48.0, px(ctx, 48.0))
         };
 
-        let label = CustomText(self.2, text_size).build(ctx, size)?;
+        let label = CustomText::label(self.2, text_size).build(ctx, size)?;
         let label_size = label.size(ctx);
 
         let width = match self.1 {
