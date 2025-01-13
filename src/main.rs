@@ -1,5 +1,6 @@
 use ramp_ds::Runtime;
 use ramp_ds::primitives::*;
+use ramp_ds::components::*;
 
 pub fn main() {
     Runtime::new(
