@@ -35,7 +35,7 @@ impl<T: ggez::graphics::Drawable + Debug + Clone> Drawable for T {
 
     //Offset built into the drawable is included in its size
     fn size(&self, ctx: &Context) -> Vec2 {
-        let rect = ggez::graphics::Drawable::dimensions(self, ctx).unwrap();
+        let rect = ggez::graphics::Drawable::dimensions(self, ctx).unwrap_or_default();
         Vec2::new(rect.w+rect.x, rect.h+rect.y)
     }
 }

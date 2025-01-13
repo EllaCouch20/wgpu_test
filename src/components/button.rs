@@ -17,27 +17,21 @@ use crate::theme::color::{
 
 
 #[derive(Debug, Clone)]
-pub struct Button {
-    style: ButtonStyle,
-    size: Size,
-}
-
-impl Button {
-    pub fn new(style: ButtonStyle, size: Size) -> Self {
-        Self {style, size}
-    }
-}
+pub struct Button(pub ButtonStyle, pub Size);
 
 impl ComponentBuilder for Button {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
         let palette = ButtonColors::new(ButtonSchemes::default());
 
-        let colors = palette.colors_from(self.style, ButtonState::Default);
+        let colors = palette.colors_from(self.0, ButtonState::Default);
 
-        let (text_size, height) = match self.size {
-            Size::Medium => (32.0, 32.0),
-            Size::Large => (48.0, 48.0)
+        let (text_size, height) = match self.1 {
+            Size::Medium => (32.0, px(32.0)),
+            Size::Large => (48.0, px(48.0))
         };
+
+        let text = ;
+        println!("size: {:?}", text.size(ctx));
 
         Ok(Component::from(vec![
             (
@@ -46,11 +40,34 @@ impl ComponentBuilder for Button {
                     width: size.x,
                     radius: 50.0,
                     color: colors.background,
-                    offset: Vec2{x: 0.0, y: 0.0},
                 }.build(ctx, size)?,
                 Rect::new(0.0, 0.0, size.x, size.y)
+            ),
+            (
+                Center(CustomText("Continue", text_size)).build(ctx, size)?,
+                Rect::new(0.0, 0.0, size.x, size.y),
             )
         ]))
+    }
+}
+
+
+#[derive(Clone, Debug)]
+pub struct CustomText(&'static str, f32);
+
+impl ComponentBuilder for CustomText {
+    fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+        Ok(Component::from(vec![(
+            Text::new(
+                TextFragment {
+                    text: self.0.to_string(),
+                    scale: Some(PxScale::from(self.1)),
+                    font: Some("Label".into()),
+                    color: Some(Color::WHITE)
+                }
+            ),
+            Rect::new(0.0, 0.0, size.x, size.y)
+        )]))
     }
 }
 

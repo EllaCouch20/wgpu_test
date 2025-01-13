@@ -12,7 +12,6 @@ pub struct Rectangle {
     pub width: f32, 
     pub height: f32,
     pub color: Color,
-    pub offset: Vec2,
     pub radius: f32,
 }
 
@@ -23,11 +22,11 @@ impl ComponentBuilder for Rectangle {
                 Mesh::new_rounded_rectangle(
                     ctx,
                     DrawMode::fill(),
-                    Rect::new(0.0, 0.0, self.width*size.x, self.height*size.y),
+                    Rect::new(0.0, 0.0, self.width, self.height),
                     self.radius,
                     self.color,
                 )?,
-                Rect::new(self.offset.x, self.offset.y, size.x, size.y)
+                Rect::new(0.0, 0.0, size.x, size.y)
             )
         ]))
     }
