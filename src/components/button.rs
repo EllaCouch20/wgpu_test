@@ -26,8 +26,8 @@ impl ComponentBuilder for Button {
         let colors = palette.colors_from(self.0, ButtonState::Default);
 
         let (text_size, height) = match self.1 {
-            Size::Medium => (32.0, px(32.0)),
-            Size::Large => (48.0, px(48.0))
+            Size::Medium => (32.0, px(ctx, 32.0)),
+            Size::Large => (48.0, px(ctx, 48.0))
         };
 
         Ok(Component::from(vec![
@@ -152,8 +152,13 @@ impl ComponentBuilder for CustomText {
 //     }
 // }
 
-pub fn px(a: f32) -> f32 {
-    a * 2.0
+pub fn px(ctx: &mut Context, a: f32) -> f32 {
+    let scale_factor = ctx.gfx.window().scale_factor(); // DPI scale factor
+    // let (logical_width, logical_height) = ctx.gfx.drawable_size();
+    // let physical_width = logical_width * scale_factor as f32;
+    // let physical_height = logical_height * scale_factor as f32;
+
+    a * scale_factor as f32
 }
 
 #[derive(Eq, Hash, PartialEq, Clone, Copy, Debug)]
