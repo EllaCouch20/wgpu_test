@@ -7,7 +7,7 @@ use crate::ComponentBuilder;
 use crate::GameResult;
 use crate::graphics::Mesh;
 use crate::graphics::DrawMode;
-use crate::structs::{Component, px};
+use crate::structs::{BuildResult, px};
 
 use crate::theme::color::{
     ButtonColors,
@@ -19,7 +19,7 @@ use crate::theme::color::{
 pub struct Button(pub ButtonStyle, pub Size, pub &'static str);
 
 impl ComponentBuilder for Button {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
         let palette = ButtonColors::new(ButtonSchemes::default());
         let colors = palette.colors_from(self.0, ButtonState::Default);
 
@@ -52,7 +52,7 @@ impl ComponentBuilder for Button {
                 Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y)
             ),
             (
-                Image::from_path(ctx, "profile_picture.png")?,
+                Image::from_path(ctx, "/profile_picture.png")?,
                 Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y)
             )
         ]
@@ -97,7 +97,7 @@ impl ComponentBuilder for Button {
 pub struct CustomText(&'static str, f32);
 
 impl ComponentBuilder for CustomText {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
+    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
         Component![(
             Text::new(
                 TextFragment {
