@@ -28,7 +28,8 @@ impl ComponentBuilder for Rectangle {
                     self.radius,
                     self.stroke,
                 )?,
-                Rect::new(0.0, 0.0, size.x, size.y)
+                Rect::new(0.0, 0.0, size.x, size.y),
+                None
             ),
             (
                 Mesh::new_rounded_rectangle(
@@ -38,7 +39,8 @@ impl ComponentBuilder for Rectangle {
                     self.radius,
                     self.color,
                 )?,
-                Rect::new(0.0, 0.0, size.x, size.y)
+                Rect::new(0.0, 0.0, size.x, size.y),
+                None
             )
         ]
     }
@@ -88,7 +90,8 @@ impl ComponentBuilder for ExtRectangle {
                     40.0,
                     Color::WHITE,
                 )?,
-                Rect::new(0.0, 0.0, size.x, size.y)
+                Rect::new(0.0, 0.0, size.x, size.y),
+                None
             )
         ]
     }

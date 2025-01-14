@@ -9,11 +9,11 @@ use ggez::{
 
 use std::{path, env};
 
-//pub mod components;
+pub mod components;
 pub mod primitives;
 pub mod structs;
 pub mod traits;
-//pub mod theme;
+pub mod theme;
 
 use theme::*;
 

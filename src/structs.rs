@@ -1,4 +1,4 @@
-use ggez::graphics::{Canvas, Rect};
+use ggez::graphics::{Canvas, Rect, DrawParam};
 use ggez::{GameResult, Context};
 use crate::traits::Drawable;
 use either::Either;
@@ -19,12 +19,12 @@ pub fn px(ctx: &mut Context, a: f32) -> f32 {
 }
 
 #[derive(Clone, Debug)]
-pub struct Child(Either<Box<dyn Drawable>, Component>, Rect);
+pub struct Child(Either<(Box<dyn Drawable>, DrawParam), Component>, Rect);
 
 impl Child {
     pub fn size(&self, ctx: &Context) -> Vec2 {
         let size = match &self.0 {
-            Either::Left(drawable) => drawable.size(ctx),
+            Either::Left((drawable, _)) => drawable.size(ctx),
             Either::Right(component) => component.size(ctx)
         };
         Vec2::new(min(size.x, self.1.w), min(size.y, self.1.h))
@@ -40,7 +40,7 @@ impl Child {
 
         let offset = Vec2::new(offset.x+self.1.x, offset.y+self.1.y);
         match &self.0 {
-            Either::Left(drawable) => drawable.draw(canvas, bound, offset),
+            Either::Left((drawable, param)) => drawable.draw(canvas, bound, offset, param.clone()),
             Either::Right(component) => {
                 component.draw(canvas, bound, offset)
             }
@@ -48,9 +48,9 @@ impl Child {
     }
 }
 
-impl<V: Drawable + 'static> From<(V, Rect)> for Child {
-    fn from(v: (V, Rect)) -> Self {
-        Child(Either::Left(Box::new(v.0)), v.1)
+impl<V: Drawable + 'static> From<(V, Rect, Option<DrawParam>)> for Child {
+    fn from(v: (V, Rect, Option<DrawParam>)) -> Self {
+        Child(Either::Left((Box::new(v.0), v.2.unwrap_or_default())), v.1)
     }
 }
 
@@ -83,7 +83,7 @@ impl Component {
 
 #[macro_export]
 macro_rules! Component {
-    [$(($i:expr, $x:expr)),*] => {{
-        Ok(crate::structs::Component(vec![$(($i, $x).into()),*]))
+    [$(($i:expr, $x:expr $(, $y:expr)?)),*] => {{
+        Ok(crate::structs::Component(vec![$(($i, $x $(, $y)?).into()),*]))
     }}
 }

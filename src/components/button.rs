@@ -1,4 +1,4 @@
-use ggez::graphics::{Rect, Image};
+use ggez::graphics::{Rect, Image, DrawParam};
 use ggez::{Context};
 use crate::primitives::*;
 use crate::Vec2;
@@ -40,11 +40,12 @@ impl ComponentBuilder for Button {
             (
                 label,
                 Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y)
-            ),
-            (
-                Image::from_path(ctx, "/profile_picture.png")?,
-                Rect::new(0.0, 0.0, size.x, size.y)
             )
+            // (
+            //     Image::from_path(ctx, "/profile_picture.png")?,
+            //     Rect::new(0.0, 0.0, size.x, size.y),
+            //     Some(DrawParam::default().scale(Vec2::new(0.5, 0.5)))
+            // )
         ]
     }
 }

@@ -57,7 +57,8 @@ impl ComponentBuilder for CustomText {
                     color: Some(self.3)
                 }
             ),
-            Rect::new(0.0, 0.0, size.x, size.y)
+            Rect::new(0.0, 0.0, size.x, size.y),
+            None
         )]
     }
 }
