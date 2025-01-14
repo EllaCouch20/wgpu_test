@@ -1,4 +1,4 @@
-use ggez::graphics::{Color, DrawMode, Mesh, Rect, Image};
+use ggez::graphics::{Color, DrawMode, Mesh, Rect};
 use ggez::{Context, GameResult};
 use ggez::glam::Vec2;
 use crate::traits::ComponentBuilder;
