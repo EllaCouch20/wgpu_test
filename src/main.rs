@@ -1,17 +1,16 @@
 use ramp_ds::Runtime;
 use ramp_ds::primitives::*;
-use ramp_ds::components::*;
+//use ramp_ds::components::*;
 
 pub fn main() {
     Runtime::new(
+      //  ExtRectangle(500.0, 100.0)
         Column!(
-            24.0,
-            Button(ButtonStyle::Primary, Size::Medium, "Continue"),
-            Button(ButtonStyle::Primary, Size::Large, "Continue"),
-            Button(ButtonStyle::Secondary, Size::Medium, "Continue"),
-            Button(ButtonStyle::Secondary, Size::Large, "Continue"),
-            Button(ButtonStyle::Ghost, Size::Medium, "Continue"),
-            Button(ButtonStyle::Ghost, Size::Large, "Continue")
+            20.0,
+            Container(ExtRectangle(300.0, 800.0), 290.0, 20.0),
+            Container(Scrollable(ExtRectangle(300.0, 800.0), 10.0), 290.0, 20.0),
+            ExtRectangle(100.0, 200.0),
+            ExtRectangle(500.0, 100.0)
         )
     ).unwrap().run().unwrap()
 }

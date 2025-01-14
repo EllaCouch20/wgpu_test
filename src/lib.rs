@@ -9,11 +9,11 @@ use ggez::{
 
 use std::{path, env};
 
-pub mod components;
+//pub mod components;
 pub mod primitives;
 pub mod structs;
 pub mod traits;
-pub mod theme;
+//pub mod theme;
 
 use traits::{ComponentBuilder};
 
@@ -47,7 +47,8 @@ impl EventHandler<GameError> for State {
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::BLACK);
 
         let bound = Rect::new(10.0, 10.0, screen_width-20.0, screen_height-20.0);
-        self.0.build(ctx, Vec2::new(screen_width-20.0, screen_height-20.0))?.draw(&mut canvas, bound);
+        println!("screen bound: {:?}", bound);
+        self.0.build(ctx, Vec2::new(screen_width-20.0, screen_height-20.0))?.draw(&mut canvas, bound, Vec2::new(10.0, 10.0));
         canvas.finish(ctx)?;
         Ok(())
     }

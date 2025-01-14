@@ -20,16 +20,18 @@ impl<C: ComponentBuilder + 'static> From<C> for Box<dyn ComponentBuilder> {
 }
 
 pub trait Drawable: Debug + DynClone {
-    fn draw(&self, canvas: &mut Canvas, bound: Rect);
+    fn draw(&self, canvas: &mut Canvas, bound: Rect, offset: Vec2);
     fn size(&self, ctx: &Context) -> Vec2;
 }
 clone_trait_object!(Drawable);
 
 impl<T: ggez::graphics::Drawable + Debug + Clone> Drawable for T {
-    fn draw(&self, canvas: &mut Canvas, bound: Rect) {
+    fn draw(&self, canvas: &mut Canvas, bound: Rect, offset: Vec2) {
+        println!("draw bound: {:?}", bound);
+        println!("draw offset: {:?}", offset);
         if bound.w > 0.0 && bound.h > 0.0 {
             canvas.set_scissor_rect(bound).unwrap();
-            ggez::graphics::Drawable::draw(self, canvas, Vec2::new(bound.x, bound.y))
+            ggez::graphics::Drawable::draw(self, canvas, offset)
         }
     }
 

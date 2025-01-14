@@ -129,10 +129,11 @@ pub struct Container<C: ComponentBuilder + Clone>(pub C, pub f32, pub f32);
 
 impl<C: ComponentBuilder + Clone> ComponentBuilder for Container<C> {
     fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
+        println!("container: {}-{}", self.1, self.2);
         Component![
             (
-                self.0.build(ctx, Vec2::new(size.x*self.1, size.y*self.2))?,
-                Rect::new(0.0, 0.0, size.x, size.y)
+                self.0.build(ctx, Vec2::new(self.1, self.2))?,
+                Rect::new(0.0, 0.0, self.1, self.2)
             )
         ]
     }
@@ -148,8 +149,10 @@ impl ComponentBuilder for Column {
         let mut bound = Rect::new(0.0, 0.0, size.x, size.y);
         Ok(crate::structs::Component(
             self.0.clone().into_iter().map(|mut builder| {
+                println!("avaiable bound: {:?}", bound);
                 let child = builder.build(ctx, Vec2::new(bound.w, bound.h))?;
                 let height = child.size(ctx).y;
+                println!("height: {}", height);
                 let res = (child, bound);
                 bound.h -= height as f32;
                 bound.y += self.1 + height as f32;
@@ -246,18 +249,4 @@ impl<C: ComponentBuilder + Clone> ComponentBuilder for Scrollable<C> {
             (component, Rect::new(0.0, -scroll, size.x, size.y))
         ]
     }
-//  fn spawn(&self, ctx: &mut Context, mut bound: Rect) -> SpawnResult {
-//      let mut children = self.component.spawn(ctx, bound)?;
-//      let content_height = children.iter().fold(0, |height, c| {let rect = c.drawable.dimensions(ctx).unwrap(); std::cmp::max(height, (rect.y + rect.h) as u32)});
-//      let max_scroll = std::cmp::max(0, content_height-bound.h as u32);
-//      let scroll = std::cmp::min(max_scroll, self.scroll as u32);
-
-//      children.iter_mut().for_each(|s| match s.param.transform {
-//          Transform::Values{dest, ..} => {
-//              s.param = s.param.dest(Vec2::new(dest.x, dest.y-scroll as f32));
-//          },
-//          _ => {}
-//      });
-//      Ok(children)
-//  }
 }

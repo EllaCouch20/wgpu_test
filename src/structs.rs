@@ -31,15 +31,18 @@ impl Child {
 
     pub fn offset(&self) -> Vec2 {Vec2::new(self.1.x, self.1.y)}
 
-    pub fn draw(&self, canvas: &mut Canvas, bound: Rect) {
-        let bound = Rect::new(
-            bound.x+self.1.x, bound.y+self.1.y,
-            min(bound.w-self.1.x, self.1.w), min(bound.h-self.1.y, self.1.h)
+    pub fn draw(&self, canvas: &mut Canvas, bound: Rect, offset: Vec2) {
+        let mut bound = Rect::new(
+            max(bound.x, bound.x+self.1.x), max(bound.y, bound.y+self.1.y),
+            min(bound.w, self.1.w), min(bound.h, self.1.h)
         );
 
+        let offset = Vec2::new(offset.x+self.1.x, offset.y+self.1.y);
         match &self.0 {
-            Either::Left(drawable) => drawable.draw(canvas, bound),
-            Either::Right(component) => component.draw(canvas, bound),
+            Either::Left(drawable) => drawable.draw(canvas, bound, offset),
+            Either::Right(component) => {
+                component.draw(canvas, bound, offset)
+            }
         }
     }
 }
@@ -66,13 +69,13 @@ impl Component {
         self.0.iter().fold(Vec2::new(0.0, 0.0), |old_size, c| {
             let size = c.size(ctx);
             let offset = c.offset();
-            Vec2::new(max(old_size.x, size.x+offset.x), max(old_size.y, size.y+offset.y))
+            Vec2::new(max(old_size.x, max(size.x, size.x+offset.x)), max(old_size.y, max(size.y, size.y+offset.y)))
         })
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, bound: Rect) {
+    pub fn draw(&self, canvas: &mut Canvas, bound: Rect, offset: Vec2) {
         for child in &self.0 {
-            child.draw(canvas, bound);
+            child.draw(canvas, bound, offset);
         }
     }
 }
