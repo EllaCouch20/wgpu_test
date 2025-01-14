@@ -1,3 +1,9 @@
+pub mod components;
+pub mod primitives;
+pub mod structs;
+pub mod traits;
+pub mod theme;
+
 use ggez::{
     event,
     glam::Vec2,
@@ -6,14 +12,6 @@ use ggez::{
     Context, GameResult, GameError, ContextBuilder,
     conf::{WindowSetup, WindowMode}
 };
-
-use std::{path, env};
-
-pub mod components;
-pub mod primitives;
-pub mod structs;
-pub mod traits;
-pub mod theme;
 
 use theme::*;
 
@@ -32,7 +30,6 @@ impl EventHandler<GameError> for State {
         let screen_size = ctx.gfx.drawable_size();
         let screen_width = screen_size.0;
         let screen_height = screen_size.1;
-        let _fonts = load_fonts(ctx);
 
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::BLACK);
 
@@ -125,15 +122,9 @@ pub struct Runtime {
 
 impl Runtime {
     pub fn new(root: impl ComponentBuilder + 'static) -> GameResult<Self> {
-        let resource_dir = if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
-            let mut path = path::PathBuf::from(manifest_dir);
-            path.push("assets");
-            path
-        } else {
-            path::PathBuf::from("./assets")
-        };
+        let resource_dir = load_resources();
     
-        let (ctx, event_loop) = ContextBuilder::new("super_simple", "ggez")
+        let (mut ctx, event_loop) = ContextBuilder::new("super_simple", "ggez")
             .window_setup(
                 WindowSetup::default()
                     .title("RampDS")
@@ -146,7 +137,8 @@ impl Runtime {
             )
             .add_resource_path(resource_dir)
             .build()?;
-
+        
+        let _fonts = load_fonts(&mut ctx);
         // let cb = ContextBuilder::new("super_simple", "ggez");
         // let (ctx, event_loop) = cb.build()?;
         Ok(Runtime{ctx, event_loop, state: State::new(root)?})

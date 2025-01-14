@@ -1,5 +1,4 @@
 use ramp_ds::Runtime;
-use ramp_ds::theme::*;
 use ramp_ds::primitives::*;
 use ramp_ds::components::*;
 

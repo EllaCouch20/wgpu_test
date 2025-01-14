@@ -1,10 +1,11 @@
-use ggez::graphics::{Rect, Image, DrawParam};
+use ggez::graphics::Rect;
 use ggez::{Context};
 use crate::primitives::*;
 use crate::Vec2;
 use crate::ComponentBuilder;
 use crate::structs::{BuildResult, px};
 use crate::theme::*;
+use super::CustomText;
 
 #[derive(Debug, Clone)]
 pub struct Button(pub ButtonStyle, pub Size, pub &'static str);

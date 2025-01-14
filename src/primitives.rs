@@ -2,7 +2,7 @@ use ggez::graphics::{Color, DrawMode, Mesh, Rect};
 use ggez::{Context, GameResult};
 use ggez::glam::Vec2;
 use crate::traits::ComponentBuilder;
-use crate::structs::{BuildResult, Child, min, max, px};
+use crate::structs::{BuildResult, Child, max, px};
 use std::fmt::Debug;
 
 pub use crate::{Component, Column};
@@ -131,7 +131,7 @@ impl<C: ComponentBuilder + Clone> ComponentBuilder for Center<C> {
 pub struct Container<C: ComponentBuilder + Clone>(pub C, pub f32, pub f32);
 
 impl<C: ComponentBuilder + Clone> ComponentBuilder for Container<C> {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
+    fn build(&mut self, ctx: &mut Context, _size: Vec2) -> BuildResult {
         println!("container: {}-{}", self.1, self.2);
         Component![
             (
@@ -157,8 +157,8 @@ impl ComponentBuilder for Column {
                 let height = child.size(ctx).y;
                 println!("height: {}", height);
                 let res = (child, bound);
-                bound.h -= height as f32;
-                bound.y += self.1 + height as f32;
+                bound.h -= height;
+                bound.y += self.1 + height;
                 Ok(res.into())
             }).collect::<GameResult<Vec<Child>>>()?
         ))
