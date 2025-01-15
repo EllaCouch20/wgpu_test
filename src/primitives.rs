@@ -1,50 +1,52 @@
-use ggez::graphics::{Color, DrawMode, Mesh, Rect};
+use ggez::graphics::{DrawMode, DrawParam, Mesh};
 use ggez::{Context, GameResult};
-use ggez::glam::Vec2;
 use crate::traits::ComponentBuilder;
-use crate::structs::{BuildResult, Child, min, max, px};
+use crate::structs::{Rect, Vec2, Child, min, max, px};
 use std::fmt::Debug;
 
-pub use crate::{Component, Column};
+//pub use crate::Component;
+pub use crate::Column;
 
-#[derive(Debug, Clone)]
-pub struct Rectangle {
-    pub width: f32,
-    pub height: f32,
-    pub color: Color,
-    pub stroke: Color,
-    pub radius: f32,
-}
+pub use ggez::graphics::Color;
 
-impl ComponentBuilder for Rectangle {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-        let stroke = px(ctx, 1.0);
-        Component![
-            (
-                Mesh::new_rounded_rectangle(
-                    ctx,
-                    DrawMode::fill(),
-                    Rect::new(0.0, 0.0, self.width, self.height),
-                    self.radius,
-                    self.stroke,
-                )?,
-                Rect::new(0.0, 0.0, size.x, size.y),
-                None
-            ),
-            (
-                Mesh::new_rounded_rectangle(
-                    ctx,
-                    DrawMode::fill(),
-                    Rect::new(stroke, stroke, self.width - stroke * 2., self.height - stroke * 2.),
-                    self.radius,
-                    self.color,
-                )?,
-                Rect::new(0.0, 0.0, size.x, size.y),
-                None
-            )
-        ]
-    }
-}
+//  #[derive(Debug, Clone)]
+//  pub struct Rectangle {
+//      pub width: f32,
+//      pub height: f32,
+//      pub color: Color,
+//      pub stroke: Color,
+//      pub radius: f32,
+//  }
+
+//  impl ComponentBuilder for Rectangle {
+//      fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
+//          let stroke = px(ctx, 1.0);
+//          Component![
+//              (
+//                  Mesh::new_rounded_rectangle(
+//                      ctx,
+//                      DrawMode::fill(),
+//                      Rect::new(0.0, 0.0, self.width, self.height),
+//                      self.radius,
+//                      self.stroke,
+//                  )?,
+//                  Rect::new(0.0, 0.0, size.x, size.y),
+//                  None
+//              ),
+//              (
+//                  Mesh::new_rounded_rectangle(
+//                      ctx,
+//                      DrawMode::fill(),
+//                      Rect::new(stroke, stroke, self.width - stroke * 2., self.height - stroke * 2.),
+//                      self.radius,
+//                      self.color,
+//                  )?,
+//                  Rect::new(0.0, 0.0, size.x, size.y),
+//                  None
+//              )
+//          ]
+//      }
+//  }
 
 // #[derive(Debug, Clone)]
 // pub struct BorderedRectangle(pub f32, pub f32, );
@@ -77,25 +79,88 @@ impl ComponentBuilder for Rectangle {
 // }
 
 #[derive(Debug, Clone)]
-pub struct ExtRectangle(pub f32, pub f32);
+pub struct ExtRectangle(pub Color);
 
 impl ComponentBuilder for ExtRectangle {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-        Component![
-            (
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+        Ok(vec![
+            Child::new_drawable(ctx,
                 Mesh::new_rounded_rectangle(
                     ctx,
                     DrawMode::fill(),
-                    Rect::new(0.0, 0.0, self.0, self.1),
+                    Rect::new(0.0, 0.0, window_size.x, window_size.y).into(),
                     40.0,
-                    Color::WHITE,
+                    self.0,
                 )?,
-                Rect::new(0.0, 0.0, size.x, size.y),
-                None
+                DrawParam::default().scale(Vec2::new(1.0, 1.0))//Offset in DrawParam is ignored
             )
-        ]
+        ])
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct TwoRectangle(pub f32);
+
+impl ComponentBuilder for TwoRectangle {
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+        let rect = ExtRectangle(Color::WHITE).build_child(ctx, Rect::new(0.0, 0.0, window_size.x, self.0*window_size.y), false)?;
+        let rect2 = ExtRectangle(Color::BLUE).build_child(ctx, Rect::new(0.0, rect.size(ctx).y+rect.offset(ctx).y, window_size.x, window_size.y-(self.0*window_size.y)-500.0), false)?;
+        Ok(vec![
+            rect, rect2
+        ])
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Column(pub Vec<Box<dyn ComponentBuilder>>, pub f32);
+
+impl ComponentBuilder for Column {
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+        let mut bound = Rect::new(0.0, 0.0, window_size.x, window_size.y);
+        self.0.clone().into_iter().map(|mut builder| {
+            let child = builder.build_child(ctx, bound, true)?;
+            let height = child.size(ctx).y;
+            bound.h -= height as f32;
+            bound.y += self.1 + height as f32;
+            Ok(child)
+        }).collect::<GameResult<Vec<Child>>>()
+    }
+}
+
+#[macro_export]
+macro_rules! Column {
+    ($x:literal, $($i:expr),*) => {{
+        Column(vec![
+            $(Box::new($i) as Box<dyn ramp_ds::traits::ComponentBuilder>),*
+        ], $x)
+    }}
+}
+
+#[derive(Debug, Clone)]
+pub struct Container<C: ComponentBuilder + Clone>(pub C, pub f32, pub f32);
+
+impl<C: ComponentBuilder + Clone> ComponentBuilder for Container<C> {
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+        Ok(vec![self.0.build_child(ctx, Rect::new(0.0, 0.0, self.1, self.2), false)?])
+    }
+}
+
+
+
+
+//  #[derive(Debug, Clone)]
+//  pub struct Scrollable<C: ComponentBuilder + Clone>(pub C, pub f32);
+
+//  impl<C: ComponentBuilder + Clone> ComponentBuilder for Scrollable<C> {
+//      fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+//          let mut component = self.0.build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y))?;
+//          let scroll = max(max(0.0, window_size.y-component.size(ctx).y), self.1);
+//          component.1.y -= scroll;
+//          Ok(vec![Child::new_component(component, window_size)])
+//      }
+//  }
+
+
 
 //  pub struct Stack(Vec<Component>);
 
@@ -111,68 +176,23 @@ impl ComponentBuilder for ExtRectangle {
 //      }
 //  }
 
-#[derive(Debug, Clone)]
-pub struct Center<C: ComponentBuilder + Clone>(pub C);
+//  #[derive(Debug, Clone)]
+//  pub struct Center<C: ComponentBuilder + Clone>(pub C);
 
-impl<C: ComponentBuilder + Clone> ComponentBuilder for Center<C> {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-        let component = self.0.build(ctx, Vec2::new(size.x, size.y))?;
-        let c_size = component.size(ctx);
-        Component![
-            (
-                component,
-                Rect::new((size.x-c_size.x)/2.0, (size.y-c_size.y)/2.0, size.x, size.y)
-            )
-        ]
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct Container<C: ComponentBuilder + Clone>(pub C, pub f32, pub f32);
-
-impl<C: ComponentBuilder + Clone> ComponentBuilder for Container<C> {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-        println!("container: {}-{}", self.1, self.2);
-        Component![
-            (
-                self.0.build(ctx, Vec2::new(self.1, self.2))?,
-                Rect::new(0.0, 0.0, self.1, self.2)
-            )
-        ]
-    }
-}
+//  impl<C: ComponentBuilder + Clone> ComponentBuilder for Center<C> {
+//      fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
+//          let component = self.0.build(ctx, Vec2::new(size.x, size.y))?;
+//          let c_size = component.size(ctx);
+//          Component![
+//              (
+//                  component,
+//                  Rect::new((size.x-c_size.x)/2.0, (size.y-c_size.y)/2.0, size.x, size.y)
+//              )
+//          ]
+//      }
+//  }
 
 
-
-#[derive(Debug, Clone)]
-pub struct Column(pub Vec<Box<dyn ComponentBuilder>>, pub f32);
-
-impl ComponentBuilder for Column {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-        let mut bound = Rect::new(0.0, 0.0, size.x, size.y);
-        Ok(crate::structs::Component(
-            self.0.clone().into_iter().map(|mut builder| {
-                println!("avaiable bound: {:?}", bound);
-                let child = builder.build(ctx, Vec2::new(bound.w, bound.h))?;
-                let height = child.size(ctx).y;
-                println!("height: {}", height);
-                let res = (child, bound);
-                bound.h -= height as f32;
-                bound.y += self.1 + height as f32;
-                Ok(res.into())
-            }).collect::<GameResult<Vec<Child>>>()?
-        ))
-    }
-}
-
-#[macro_export]
-macro_rules! Column {
-    ($x:literal, $($i:expr),*) => {{
-        Column(vec![
-            $(Box::new($i) as Box<dyn ramp_ds::traits::ComponentBuilder>),*
-        ], $x)
-    }}
-}
 
 // let image = Image::from_path(ctx, "/profile_picture.png")?;
 
@@ -241,15 +261,3 @@ macro_rules! Column {
 //      fn update(&mut self, _ctx: &mut Context) -> GameResult {Ok(())}
 //  }
 
-#[derive(Debug, Clone)]
-pub struct Scrollable<C: ComponentBuilder + Clone>(pub C, pub f32);
-
-impl<C: ComponentBuilder + Clone> ComponentBuilder for Scrollable<C> {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-        let component = self.0.build(ctx, size)?;
-        let scroll = max(max(0.0, size.y-component.size(ctx).y), self.1);
-        Component![
-            (component, Rect::new(0.0, -scroll, size.x, size.y))
-        ]
-    }
-}

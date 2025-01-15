@@ -1,23 +1,22 @@
 use ggez::{
     event,
-    glam::Vec2,
     event::{EventHandler, EventLoop},
-    graphics::{self, Rect, Canvas},
+    graphics::{self, Canvas},
     Context, GameResult, GameError, ContextBuilder,
     conf::{WindowSetup, WindowMode}
 };
 
 use std::{path, env};
 
-pub mod components;
+//pub mod components;
 pub mod primitives;
 pub mod structs;
 pub mod traits;
-pub mod theme;
-
-use theme::*;
+//pub mod theme;
+//use theme::*;
 
 use traits::{ComponentBuilder};
+use structs::{Rect, Vec2};
 
 struct State(Box<dyn ComponentBuilder>);
 
@@ -29,16 +28,28 @@ impl State {
 
 impl EventHandler<GameError> for State {
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
+        println!("-----------------------------------------DRAW-------------------------------");
         let screen_size = ctx.gfx.drawable_size();
         let screen_width = screen_size.0;
         let screen_height = screen_size.1;
-        let _fonts = load_fonts(ctx);
+        //let _fonts = load_fonts(ctx);
 
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::BLACK);
 
-        let bound = Rect::new(10.0, 10.0, screen_width-20.0, screen_height-20.0);
-        println!("screen bound: {:?}", bound);
-        self.0.build(ctx, Vec2::new(screen_width-20.0, screen_height-20.0))?.draw(&mut canvas, bound, Vec2::new(10.0, 10.0));
+        let offset = Vec2::new(0.0, 0.0);
+        let window = Rect::new(offset.x, offset.y, screen_width, screen_height);
+
+        //window.x,y offset from parent
+        //window.w,h max size of element
+
+        //window.x,y offset from top left of screen//Window offset
+        //window.w,h screen size
+
+        //offset.x,y offset from top left of screen//Actual element offset
+        let page = self.0.build(ctx, window)?;
+        println!("Page: {:#?}", page);
+        page.draw(ctx, &mut canvas, window, offset);
+
         canvas.finish(ctx)?;
         Ok(())
     }
@@ -132,7 +143,7 @@ impl Runtime {
         } else {
             path::PathBuf::from("./assets")
         };
-    
+
         let (ctx, event_loop) = ContextBuilder::new("super_simple", "ggez")
             .window_setup(
                 WindowSetup::default()
@@ -147,8 +158,6 @@ impl Runtime {
             .add_resource_path(resource_dir)
             .build()?;
 
-        // let cb = ContextBuilder::new("super_simple", "ggez");
-        // let (ctx, event_loop) = cb.build()?;
         Ok(Runtime{ctx, event_loop, state: State::new(root)?})
     }
 
