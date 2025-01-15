@@ -1,3 +1,9 @@
+//pub mod components;
+pub mod primitives;
+pub mod structs;
+pub mod traits;
+//pub mod theme;
+
 use ggez::{
     event,
     event::{EventHandler, EventLoop},
@@ -8,11 +14,6 @@ use ggez::{
 
 use std::{path, env};
 
-//pub mod components;
-pub mod primitives;
-pub mod structs;
-pub mod traits;
-//pub mod theme;
 //use theme::*;
 
 use traits::{ComponentBuilder};
@@ -157,7 +158,6 @@ impl Runtime {
             )
             .add_resource_path(resource_dir)
             .build()?;
-
         Ok(Runtime{ctx, event_loop, state: State::new(root)?})
     }
 
