@@ -6,45 +6,27 @@ use crate::Vec2;
 use crate::ComponentBuilder;
 use crate::structs::{Child, Rect, px};
 use crate::theme::*;
+use crate::components::*;
 use super::CustomText;
 use crate::GameResult;
 
 #[derive(Debug, Clone)]
 pub struct TextInput(pub &'static str);
 
-impl ComponentBuilder for Button {
+impl ComponentBuilder for TextInput {
     fn build_children(&mut self, ctx: &mut Context, parent_size: Vec2) -> GameResult<Vec<Child>> {
-        let colors = palette().button.colors_from(self.0, ButtonState::Default);
-
-        let (text_size, height) = match self.1 {
-            Size::Medium => (32.0, px(ctx, 32.0)),
-            Size::Large => (48.0, px(ctx, 48.0))
-        };
-
-        let mut label = CustomText::label(self.3, text_size)
-            .build(ctx, Rect::new(0.0, 0.0, parent_size.x, parent_size.y), true)?;
-
-        let label_size = label.size(ctx);
-
-        let width = match self.2 {
-            Width::Hug => label_size.x + 48.0,
-            Width::Expand => parent_size.x
-        };
-
-        label.1.x = (width - label_size.x) / 2.0;
-        label.1.y = (height - label_size.y) / 2.0;
+        let colors = palette().button.colors_from(ButtonStyle::Secondary, ButtonState::Default);
 
         Ok(vec![
             Box::new(
                 Rectangle {
-                    height,
-                    width,
-                    radius: 50.0,
+                    height: px(ctx, 48.0),
+                    width: parent_size.x,
+                    radius: 24.0,
                     stroke: colors.outline,
                     color: colors.background,
                 }.build(ctx, Rect::new(0.0, 0.0, parent_size.x, parent_size.y), true)?,
-            ),
-            Box::new(label)
+            )
         ])
     }
 }

@@ -8,7 +8,7 @@ use traits::Drawable;
 
 use ggez::{
     event,
-    event::{EventHandler, EventLoop},
+    event::{EventHandler, EventLoop, MouseButton},
     graphics::{self, Canvas},
     Context, GameResult, GameError, ContextBuilder,
     conf::{WindowSetup, WindowMode}
@@ -57,11 +57,13 @@ impl EventHandler<GameError> for State {
         Ok(())
     }
 
-    fn update(&mut self, ctx: &mut Context) -> GameResult {self.0.update(ctx)}
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
+        self.0.update(ctx)
+    }
 
-//  fn mouse_button_down_event(
-//      &mut self, ctx: &mut Context, b: MouseButton, x: f32, y: f32
-//  ) -> GameResult {self.0.mouse_button_down_event(ctx, b, x, y)}
+    // fn mouse_button_down_event(
+    //     &mut self, ctx: &mut Context, b: MouseButton, x: f32, y: f32
+    // ) -> GameResult {self.mouse_button_down_event(ctx, b, x, y)}
 
 //  fn mouse_button_up_event(
 //      &mut self, ctx: &mut Context, b: MouseButton, x: f32, y: f32
@@ -87,9 +89,13 @@ impl EventHandler<GameError> for State {
 //      &mut self, ctx: &mut Context, input: KeyInput
 //  ) -> GameResult {self.0.key_up_event(ctx, input)}
 
-//  fn text_input_event(
-//      &mut self, ctx: &mut Context, character: char
-//  ) -> GameResult {self.0.text_input_event(ctx, character)}
+    // fn text_input_event(
+    //     &mut self, ctx: &mut Context, character: char
+    // ) -> GameResult {
+    //    let x = self.text_input_event(ctx, character);
+    //    println!("input: {:?}", x);
+    //    x
+    // }
 
 //  fn touch_event(
 //      &mut self, ctx: &mut Context, phase: TouchPhase, x: f64, y: f64

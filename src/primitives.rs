@@ -6,6 +6,7 @@ use std::fmt::Debug;
 
 //pub use crate::Component;
 pub use crate::Column;
+pub use crate::Row;
 
 pub use ggez::graphics::Color;
 
@@ -104,6 +105,32 @@ macro_rules! Column {
         ], $x)
     }}
 }
+
+#[derive(Debug, Clone)]
+pub struct Row(pub Vec<Box<dyn ComponentBuilder>>, pub f32);
+
+impl ComponentBuilder for Row {
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+        let mut bound = Rect::new(0.0, 0.0, window_size.x, window_size.y);
+        self.0.clone().into_iter().map(|mut builder| {
+            let child = builder.build(ctx, bound, true)?;
+            let width = child.size(ctx).x;
+            bound.w -= width;
+            bound.x += self.1 + width;
+            Ok(Box::new(child) as Child)
+        }).collect::<GameResult<Vec<Child>>>()
+    }
+}
+
+#[macro_export]
+macro_rules! Row {
+    ($x:literal, $($i:expr),*) => {{
+        Row(vec![
+            $(Box::new($i) as Box<dyn ramp_ds::traits::ComponentBuilder>),*
+        ], $x)
+    }}
+}
+
 
 #[derive(Debug, Clone)]
 pub struct Container<C: ComponentBuilder + Clone>(pub C, pub f32, pub f32);
