@@ -30,7 +30,7 @@ impl CustomText {
 }
 
 impl ComponentBuilder for CustomText {
-    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+    fn build_children(&mut self, ctx: &mut Context, parent_size: Vec2) -> GameResult<Vec<Child>> {
         Ok(vec![
             Box::new((
                 Text::new(

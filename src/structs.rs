@@ -22,10 +22,10 @@ pub type Child = Box<dyn Drawable>;
 pub struct Component(pub Vec<Child>, pub Rect, pub bool);//(Offset, size), STFu
 
 impl Drawable for Component {
-    fn draw(&self, canvas: &mut Canvas, window: Rect, offset: Vec2) {
+    fn draw(&self, canvas: &mut Canvas, parent_size: Rect, offset: Vec2) {
         let window = Rect::new(
-            max(window.x, window.x+self.1.x), max(window.y, window.y+self.1.y),//New window offset
-            min(window.w, self.1.w), min(window.h, self.1.h)//New window size
+            max(parent_size.x, parent_size.x+self.1.x), max(parent_size.y, parent_size.y+self.1.y),//New window offset
+            min(parent_size.w, self.1.w), min(parent_size.h, self.1.h)//New window size
         );
 
         for child in &self.0 {
