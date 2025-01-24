@@ -4,6 +4,8 @@ pub mod structs;
 pub mod traits;
 //pub mod theme;
 
+use traits::Drawable;
+
 use ggez::{
     event,
     event::{EventHandler, EventLoop},
@@ -49,7 +51,7 @@ impl EventHandler<GameError> for State {
         //offset.x,y offset from top left of screen//Actual element offset
         let page = self.0.build(ctx, window, false)?;
         println!("Page: {:#?}", page);
-        page.draw(ctx, &mut canvas, window, offset);
+        page.draw(&mut canvas, window, offset);
 
         canvas.finish(ctx)?;
         Ok(())

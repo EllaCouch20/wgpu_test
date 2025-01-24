@@ -1,7 +1,7 @@
 use ggez::graphics::{DrawMode, DrawParam, Mesh};
 use ggez::{Context, GameResult};
-use crate::traits::ComponentBuilder;
-use crate::structs::{Rect, Vec2, Child, min, max, px};
+use crate::traits::{ComponentBuilder, Drawable};
+use crate::structs::{Rect, Vec2, Child};
 use std::fmt::Debug;
 
 //pub use crate::Component;
@@ -84,7 +84,7 @@ pub struct ExtRectangle(pub Color);
 impl ComponentBuilder for ExtRectangle {
     fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
         Ok(vec![
-            Child::new_drawable(ctx,
+            Box::new((
                 Mesh::new_rounded_rectangle(
                     ctx,
                     DrawMode::fill(),
@@ -93,7 +93,7 @@ impl ComponentBuilder for ExtRectangle {
                     self.0,
                 )?,
                 DrawParam::default().scale(Vec2::new(1.0, 1.0))//Offset in DrawParam is ignored
-            )
+            ))
         ])
     }
 }
@@ -103,10 +103,10 @@ pub struct TwoRectangle(pub f32);
 
 impl ComponentBuilder for TwoRectangle {
     fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
-        let rect = ExtRectangle(Color::WHITE).build_child(ctx, Rect::new(0.0, 0.0, window_size.x, self.0*window_size.y), false)?;
-        let rect2 = ExtRectangle(Color::BLUE).build_child(ctx, Rect::new(0.0, rect.size(ctx).y+rect.offset(ctx).y, window_size.x, window_size.y-(self.0*window_size.y)-500.0), false)?;
+        let rect = ExtRectangle(Color::WHITE).build(ctx, Rect::new(0.0, 0.0, window_size.x, self.0*window_size.y), false)?;
+        let rect2 = ExtRectangle(Color::BLUE).build(ctx, Rect::new(0.0, rect.size(ctx).y+rect.offset(ctx).y, window_size.x, window_size.y-(self.0*window_size.y)-500.0), false)?;
         Ok(vec![
-            rect, rect2
+            Box::new(rect), Box::new(rect2)
         ])
     }
 }
@@ -118,11 +118,11 @@ impl ComponentBuilder for Column {
     fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
         let mut bound = Rect::new(0.0, 0.0, window_size.x, window_size.y);
         self.0.clone().into_iter().map(|mut builder| {
-            let child = builder.build_child(ctx, bound, true)?;
+            let child = builder.build(ctx, bound, true)?;
             let height = child.size(ctx).y;
-            bound.h -= height as f32;
-            bound.y += self.1 + height as f32;
-            Ok(child)
+            bound.h -= height;
+            bound.y += self.1 + height;
+            Ok(Box::new(child) as Child)
         }).collect::<GameResult<Vec<Child>>>()
     }
 }
@@ -140,23 +140,20 @@ macro_rules! Column {
 pub struct Container<C: ComponentBuilder + Clone>(pub C, pub f32, pub f32);
 
 impl<C: ComponentBuilder + Clone> ComponentBuilder for Container<C> {
-    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
-        Ok(vec![self.0.build_child(ctx, Rect::new(0.0, 0.0, self.1, self.2), false)?])
+    fn build_children(&mut self, ctx: &mut Context, _window_size: Vec2) -> GameResult<Vec<Child>> {
+        Ok(vec![Box::new(self.0.build(ctx, Rect::new(0.0, 0.0, self.1, self.2), false)?)])
     }
 }
-
-
-
 
 //  #[derive(Debug, Clone)]
 //  pub struct Scrollable<C: ComponentBuilder + Clone>(pub C, pub f32);
 
 //  impl<C: ComponentBuilder + Clone> ComponentBuilder for Scrollable<C> {
 //      fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
-//          let mut component = self.0.build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y))?;
+//          let mut component = self.0.build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y), false)?;
 //          let scroll = max(max(0.0, window_size.y-component.size(ctx).y), self.1);
 //          component.1.y -= scroll;
-//          Ok(vec![Child::new_component(component, window_size)])
+//          Ok(vec![component])
 //      }
 //  }
 

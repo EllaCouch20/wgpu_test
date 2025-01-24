@@ -1,11 +1,7 @@
-use ggez::graphics::{Canvas, DrawParam};
-use ggez::{GameResult, Context};
+use ggez::graphics::Canvas;
+use ggez::{Context};
 use ggez::{graphics, glam, mint};
-use crate::traits::{Drawable};
-use crate::traits;
-use either::Either;
-
-//pub use ggez::glam::Vec2;
+use crate::traits::Drawable;
 
 pub fn min(x: f32, y: f32) -> f32 {
     std::cmp::min(x as i32, y as i32) as f32
@@ -20,85 +16,36 @@ pub fn px(ctx: &mut Context, a: f32) -> f32 {
     a * scale_factor as f32
 }
 
-#[derive(Clone)]
-pub struct Child(Either<(Box<dyn Drawable>, DrawParam), Component>);//MaxSize, STF
-
-impl Child {
-    pub fn new_drawable(ctx: &Context, drawable: impl Drawable + 'static, param: DrawParam) -> Self {
-        let drawable = Box::new(drawable);
-        Child(Either::Left((drawable, param)))
-    }
-
-    pub fn new_component(component: Component) -> Self {
-        Child(Either::Right(component))
-    }
-
-    pub fn size(&self, ctx: &Context) -> Vec2 {
-        match &self.0 {
-            Either::Left((drawable, _param)) => drawable.size(ctx),
-            Either::Right(component) => component.size(ctx),
-        }
-    }
-
-    pub fn offset(&self, ctx: &Context) -> Vec2 {
-        match &self.0 {
-            Either::Left((drawable, _param)) => drawable.offset(ctx),
-            Either::Right(component) => component.offset(ctx),
-        }
-    }
-
-    pub fn draw(&self, ctx: &Context, canvas: &mut Canvas, window: Rect, mut offset: Vec2) {
-        match &self.0 {
-            Either::Left((drawable, param)) => drawable.draw(canvas, window, offset, param.clone()),
-            Either::Right(component) => component.draw(ctx, canvas, window, offset)
-        }
-    }
-}
-
-impl std::fmt::Debug for Child {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut fmt = f.debug_tuple("Child");
-        match &self.0 {
-            Either::Left((drawable, _param)) => fmt.field(&"(Drawable, DrawParam)"),
-            Either::Right(component) => fmt.field(component)
-        };
-        fmt.finish()
-    }
-}
-
-pub struct ComponentParam {
-    pub offset: Vec2,
-    pub shrink_to_fit: bool
-}
+pub type Child = Box<dyn Drawable>;
 
 #[derive(Clone, Debug)]
-pub struct Component(pub Vec<Child>, pub Vec2, pub Vec2, pub bool);//Offset, size, STF
+pub struct Component(pub Vec<Child>, pub Rect, pub bool);//(Offset, size), STF
 
-impl Component {
-    //Size of an element is Max Size+Offset of its children limited to their Max size
-    pub fn size(&self, ctx: &Context) -> Vec2 {
-        if !self.3 {return self.2;}
+impl Drawable for Component {
+    fn draw(&self, canvas: &mut Canvas, window: Rect, offset: Vec2) {
+        let window = Rect::new(
+            max(window.x, window.x+self.1.x), max(window.y, window.y+self.1.y),//New window offset
+            min(window.w, self.1.w), min(window.h, self.1.h)//New window size
+        );
+
+        for child in &self.0 {
+            child.draw(canvas, window, offset+self.1.position());
+        }
+    }
+
+    //Size of an element is Max Size+Offset of its children limited to the Max size
+    fn size(&self, ctx: &Context) -> Vec2 {
+        if !self.2 {return self.1.size();}
 
         let size = self.0.iter().fold(Vec2::new(0.0, 0.0), |old_size, c| {
             let size = c.size(ctx);
             let offset = c.offset(ctx);
             Vec2::new(max(old_size.x, offset.x+size.x), max(old_size.y, offset.y+size.y))
         });
-        Vec2::new(min(size.x, self.2.x), min(size.y, self.2.y))
+        Vec2::new(min(size.x, self.1.w), min(size.y, self.1.h))
     }
 
-    pub fn offset(&self, ctx: &Context) -> Vec2 {self.1}
-
-    pub fn draw(&self, ctx: &Context, canvas: &mut Canvas, window: Rect, offset: Vec2) {
-        let window = Rect::new(
-            max(window.x, window.x+self.1.x), max(window.y, window.y+self.1.y),//New window offset
-            min(window.w, self.2.x), min(window.h, self.2.y)//New window size
-        );
-
-        for child in &self.0 {
-            child.draw(ctx, canvas, window, offset+self.1);
-        }
-    }
+    fn offset(&self, _ctx: &Context) -> Vec2 {self.1.position()}
 }
 
 //  #[macro_export]
