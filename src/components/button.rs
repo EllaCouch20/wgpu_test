@@ -23,7 +23,7 @@ impl ComponentBuilder for Button {
 
         let mut label = CustomText::label(self.2, text_size)
             .build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y), true)?;
-            
+
         let label_size = label.size(ctx);
 
         let width = match self.1 {
@@ -42,7 +42,7 @@ impl ComponentBuilder for Button {
                     radius: 50.0,
                     stroke: colors.outline,
                     color: colors.background,
-                }.build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y), false)?,
+                }.build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y), true)?,
             ),
             Box::new(label)
         ])
