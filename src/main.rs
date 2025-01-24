@@ -15,12 +15,12 @@ pub fn main() {
             CustomText::primary("Primary Example", 32.0),
             CustomText::secondary("Secondary Example", 24.0),
             CustomText::heading("Heading Example", 48.0),
-            Button(ButtonStyle::Primary, Size::Medium, "Continue"),
-            Button(ButtonStyle::Primary, Size::Large, "Continue"),
-            Button(ButtonStyle::Secondary, Size::Medium, "Continue"),
-            Button(ButtonStyle::Secondary, Size::Large, "Continue"),
-            Button(ButtonStyle::Ghost, Size::Medium, "Continue"),
-            Button(ButtonStyle::Ghost, Size::Large, "Continue")
+            Button(ButtonStyle::Primary, Size::Large, Width::Expand, "Continue"),
+            Button(ButtonStyle::Primary, Size::Medium, Width::Hug, "Continue"),
+            Button(ButtonStyle::Secondary, Size::Large, Width::Expand, "Continue"),
+            Button(ButtonStyle::Secondary, Size::Medium, Width::Hug, "Continue"),
+            Button(ButtonStyle::Ghost, Size::Large, Width::Expand, "Continue"),
+            Button(ButtonStyle::Ghost, Size::Medium, Width::Hug, "Continue")
       )
     ).unwrap().run().unwrap()
 }
