@@ -1,7 +1,7 @@
 use ggez::graphics::{DrawMode, DrawParam, Mesh};
 use ggez::{Context, GameResult};
 use crate::traits::{ComponentBuilder, Drawable};
-use crate::structs::{Rect, Vec2, Child};
+use crate::structs::{Vec2, Rect, Child, px};
 use std::fmt::Debug;
 
 //pub use crate::Component;
@@ -9,74 +9,43 @@ pub use crate::Column;
 
 pub use ggez::graphics::Color;
 
-//  #[derive(Debug, Clone)]
-//  pub struct Rectangle {
-//      pub width: f32,
-//      pub height: f32,
-//      pub color: Color,
-//      pub stroke: Color,
-//      pub radius: f32,
-//  }
+ #[derive(Debug, Clone)]
+ pub struct Rectangle {
+     pub width: f32,
+     pub height: f32,
+     pub color: Color,
+     pub stroke: Color,
+     pub radius: f32,
+ }
 
-//  impl ComponentBuilder for Rectangle {
-//      fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
-//          let stroke = px(ctx, 1.0);
-//          Component![
-//              (
-//                  Mesh::new_rounded_rectangle(
-//                      ctx,
-//                      DrawMode::fill(),
-//                      Rect::new(0.0, 0.0, self.width, self.height),
-//                      self.radius,
-//                      self.stroke,
-//                  )?,
-//                  Rect::new(0.0, 0.0, size.x, size.y),
-//                  None
-//              ),
-//              (
-//                  Mesh::new_rounded_rectangle(
-//                      ctx,
-//                      DrawMode::fill(),
-//                      Rect::new(stroke, stroke, self.width - stroke * 2., self.height - stroke * 2.),
-//                      self.radius,
-//                      self.color,
-//                  )?,
-//                  Rect::new(0.0, 0.0, size.x, size.y),
-//                  None
-//              )
-//          ]
-//      }
-//  }
+impl ComponentBuilder for Rectangle {
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+        let stroke = px(ctx, 1.0);
+        Ok(vec![
+            Box::new((
+                Mesh::new_rounded_rectangle(
+                    ctx,
+                    DrawMode::fill(),
+                    Rect::new(0.0, 0.0, self.width, self.height).into(),
+                    self.radius,
+                    self.stroke,
+                )?,
+                DrawParam::default().scale(Vec2::new(1.0, 1.0))
+            )),
+            Box::new((
+                Mesh::new_rounded_rectangle(
+                    ctx,
+                    DrawMode::fill(),
+                    Rect::new(stroke, stroke, self.width - stroke * 2., self.height - stroke * 2.).into(),
+                    self.radius,
+                    self.color,
+                )?,
+                DrawParam::default().scale(Vec2::new(1.0, 1.0))
+            ))
+        ])
+    }
+}
 
-// #[derive(Debug, Clone)]
-// pub struct BorderedRectangle(pub f32, pub f32, );
-
-// impl ComponentBuilder for BorderedRectangle {
-//     fn build(&mut self, ctx: &mut Context, size: Vec2) -> GameResult<Component> {
-//         Ok(Component::from(vec![
-//             (
-//                 Mesh::new_rounded_rectangle(
-//                     ctx,
-//                     DrawMode::fill(),
-//                     Rect::new(0.0, 0.0, self.0*size.x, self.1*size.y),
-//                     40.0,
-//                     Color::WHITE,
-//                 )?,
-//                 Rect::new(20.0, 20.0, size.x, size.y)
-//             )
-//             (
-//                 Mesh::new_rounded_rectangle(
-//                     ctx,
-//                     DrawMode::fill(),
-//                     Rect::new(0.0, 0.0, self.0*size.x, self.1*size.y),
-//                     40.0,
-//                     Color::WHITE,
-//                 )?,
-//                 Rect::new(20.0, 20.0, size.x, size.y)
-//             )
-//         ]))
-//     }
-// }
 
 #[derive(Debug, Clone)]
 pub struct ExtRectangle(pub Color);

@@ -1,8 +1,8 @@
-//pub mod components;
+pub mod components;
 pub mod primitives;
 pub mod structs;
 pub mod traits;
-//pub mod theme;
+pub mod theme;
 
 use traits::Drawable;
 
@@ -16,7 +16,7 @@ use ggez::{
 
 use std::{path, env};
 
-//use theme::*;
+use theme::*;
 
 use traits::{ComponentBuilder};
 use structs::{Rect, Vec2};
@@ -31,11 +31,11 @@ impl State {
 
 impl EventHandler<GameError> for State {
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        println!("-----------------------------------------DRAW-------------------------------");
+        // println!("-----------------------------------------DRAW-------------------------------");
         let screen_size = ctx.gfx.drawable_size();
         let screen_width = screen_size.0;
         let screen_height = screen_size.1;
-        //let _fonts = load_fonts(ctx);
+        let _fonts = load_fonts(ctx);
 
         let mut canvas = Canvas::from_frame(ctx, graphics::Color::BLACK);
 
@@ -50,7 +50,7 @@ impl EventHandler<GameError> for State {
 
         //offset.x,y offset from top left of screen//Actual element offset
         let page = self.0.build(ctx, window, false)?;
-        println!("Page: {:#?}", page);
+        // println!("Page: {:#?}", page);
         page.draw(&mut canvas, window, offset);
 
         canvas.finish(ctx)?;

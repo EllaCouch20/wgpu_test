@@ -33,10 +33,10 @@ clone_trait_object!(Drawable);
 
 impl<T: ggez::graphics::Drawable + Debug + Clone> Drawable for (T, DrawParam) {
     fn draw(&self, canvas: &mut Canvas, window: Rect, offset: Vec2) {
-        println!("window: {:?}", window);
-        println!("offset: {:?}", offset);
+        // println!("window: {:?}", window);
+        // println!("offset: {:?}", offset);
         if canvas.set_scissor_rect(window.into()).is_ok() {
-            println!("OK");
+            // println!("OK");
             ggez::graphics::Drawable::draw(&self.0, canvas, self.1.dest(offset))
         }
     }

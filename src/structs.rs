@@ -19,7 +19,7 @@ pub fn px(ctx: &mut Context, a: f32) -> f32 {
 pub type Child = Box<dyn Drawable>;
 
 #[derive(Clone, Debug)]
-pub struct Component(pub Vec<Child>, pub Rect, pub bool);//(Offset, size), STF
+pub struct Component(pub Vec<Child>, pub Rect, pub bool);//(Offset, size), STFu
 
 impl Drawable for Component {
     fn draw(&self, canvas: &mut Canvas, window: Rect, offset: Vec2) {

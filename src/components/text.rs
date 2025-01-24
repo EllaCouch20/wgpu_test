@@ -4,8 +4,9 @@ use ggez::graphics::{
     Text,
     Rect,
     Color,
+    DrawParam,
 };
-use crate::Component;
+use crate::GameResult;
 use crate::ComponentBuilder;
 use crate::structs::*;
 use crate::palette;
@@ -29,18 +30,19 @@ impl CustomText {
 }
 
 impl ComponentBuilder for CustomText {
-    fn build(&mut self, _ctx: &mut Context, size: Vec2) -> BuildResult {
-        Component![(
-            Text::new(
-                TextFragment {
-                    text: self.0.to_string(),
-                    scale: Some(self.1.into()),
-                    font: Some(self.2.into()),
-                    color: Some(self.3)
-                }
-            ),
-            Rect::new(0.0, 0.0, size.x, size.y),
-            None
-        )]
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
+        Ok(vec![
+            Box::new((
+                Text::new(
+                    TextFragment {
+                        text: self.0.to_string(),
+                        scale: Some(self.1.into()),
+                        font: Some(self.2.into()),
+                        color: Some(self.3)
+                    }
+                ),
+                DrawParam::default().scale(Vec2::new(1.0, 1.0))//Offset in DrawParam is ignored
+            )),
+        ])
     }
 }

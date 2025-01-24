@@ -1,17 +1,19 @@
-use ggez::graphics::Rect;
+use ggez::graphics::{DrawParam};
 use ggez::{Context};
 use crate::primitives::*;
+use crate::traits::Drawable;
 use crate::Vec2;
 use crate::ComponentBuilder;
-use crate::structs::{BuildResult, px};
+use crate::structs::{Child, Rect, px};
 use crate::theme::*;
 use super::CustomText;
+use crate::GameResult;
 
 #[derive(Debug, Clone)]
 pub struct Button(pub ButtonStyle, pub Size, pub &'static str);
 
 impl ComponentBuilder for Button {
-    fn build(&mut self, ctx: &mut Context, size: Vec2) -> BuildResult {
+    fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>> {
         let colors = palette().button.colors_from(self.0, ButtonState::Default);
 
         let (text_size, height) = match self.1 {
@@ -19,35 +21,31 @@ impl ComponentBuilder for Button {
             Size::Large => (48.0, px(ctx, 48.0))
         };
 
-        let label = CustomText::label(self.2, text_size).build(ctx, size)?;
+        let mut label = CustomText::label(self.2, text_size)
+            .build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y), true)?;
+            
         let label_size = label.size(ctx);
 
         let width = match self.1 {
             Size::Medium => label_size.x + 48.0,
-            Size::Large => size.x
+            Size::Large => window_size.x
         };
 
-        Component![
-            (
+        label.1.x = (width - label_size.x) / 2.0;
+        label.1.y = (height - label_size.y) / 2.0;
+
+        Ok(vec![
+            Box::new(
                 Rectangle {
                     height,
                     width,
                     radius: 50.0,
                     stroke: colors.outline,
                     color: colors.background,
-                }.build(ctx, size)?,
-                Rect::new(0.0, 0.0, size.x, size.y)
+                }.build(ctx, Rect::new(0.0, 0.0, window_size.x, window_size.y), false)?,
             ),
-            (
-                label,
-                Rect::new((width-label_size.x) / 2., (height-label_size.y) / 2., size.x, size.y)
-            )
-            // (
-            //     Image::from_path(ctx, "/profile_picture.png")?,
-            //     Rect::new(0.0, 0.0, size.x, size.y),
-            //     Some(DrawParam::default().scale(Vec2::new(0.5, 0.5)))
-            // )
-        ]
+            Box::new(label)
+        ])
     }
 }
 
