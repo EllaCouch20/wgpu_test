@@ -13,12 +13,12 @@ use dyn_clone::{DynClone, clone_trait_object};
 pub trait ComponentBuilder: Debug + DynClone {
     fn build_children(&mut self, ctx: &mut Context, window_size: Vec2) -> GameResult<Vec<Child>>;
 
-    fn build(&mut self, ctx: &mut Context, window: Rect) -> GameResult<Component> {
-        Ok(Component(self.build_children(ctx, window.size())?, window.position()))
+    fn build(&mut self, ctx: &mut Context, window: Rect, shrink_to_fit: bool) -> GameResult<Component> {
+        Ok(Component(self.build_children(ctx, window.size())?, window.position(), window.size(), shrink_to_fit))
     }
 
     fn build_child(&mut self, ctx: &mut Context, window: Rect, shrink_to_fit: bool) -> GameResult<Child> {
-        Ok(Child::new_component(self.build(ctx, window)?, window.size(), shrink_to_fit))
+        Ok(Child::new_component(self.build(ctx, window, shrink_to_fit)?))
     }
 
     //events

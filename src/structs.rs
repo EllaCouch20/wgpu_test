@@ -21,26 +21,23 @@ pub fn px(ctx: &mut Context, a: f32) -> f32 {
 }
 
 #[derive(Clone)]
-pub struct Child(Either<(Box<dyn Drawable>, DrawParam), Component>, Vec2, bool);//MaxSize, STF
+pub struct Child(Either<(Box<dyn Drawable>, DrawParam), Component>);//MaxSize, STF
 
 impl Child {
     pub fn new_drawable(ctx: &Context, drawable: impl Drawable + 'static, param: DrawParam) -> Self {
         let drawable = Box::new(drawable);
-        let size = drawable.size(ctx);
-        Child(Either::Left((drawable, param)), size, true)
+        Child(Either::Left((drawable, param)))
     }
 
-    pub fn new_component(component: Component, window_size: Vec2, shrink_to_fit: bool) -> Self {
-        Child(Either::Right(component), window_size, shrink_to_fit)
+    pub fn new_component(component: Component) -> Self {
+        Child(Either::Right(component))
     }
 
     pub fn size(&self, ctx: &Context) -> Vec2 {
-        if !self.2 {return self.1;}
         match &self.0 {
             Either::Left((drawable, _param)) => drawable.size(ctx),
             Either::Right(component) => component.size(ctx),
         }
-        //Vec2::new(min(size.x, self.1.x), min(size.y, self.1.y))
     }
 
     pub fn offset(&self, ctx: &Context) -> Vec2 {
@@ -51,14 +48,6 @@ impl Child {
     }
 
     pub fn draw(&self, ctx: &Context, canvas: &mut Canvas, window: Rect, mut offset: Vec2) {
-        println!("draw_pre_win: {:?}", window);
-        let window = Rect::new(
-            window.x, window.y,//window.x, window.y,
-            min(window.w, self.1.x), min(window.h, self.1.y)//New window size
-        );
-        println!("draw_off: {:?}", offset);
-        println!("draw_win: {:?}", window);
-
         match &self.0 {
             Either::Left((drawable, param)) => drawable.draw(canvas, window, offset, param.clone()),
             Either::Right(component) => component.draw(ctx, canvas, window, offset)
@@ -73,7 +62,6 @@ impl std::fmt::Debug for Child {
             Either::Left((drawable, _param)) => fmt.field(&"(Drawable, DrawParam)"),
             Either::Right(component) => fmt.field(component)
         };
-        fmt.field(&self.1);
         fmt.finish()
     }
 }
@@ -84,28 +72,30 @@ pub struct ComponentParam {
 }
 
 #[derive(Clone, Debug)]
-pub struct Component(pub Vec<Child>, pub Vec2);//Offset
+pub struct Component(pub Vec<Child>, pub Vec2, pub Vec2, pub bool);//Offset, size, STF
 
 impl Component {
     //Size of an element is Max Size+Offset of its children limited to their Max size
     pub fn size(&self, ctx: &Context) -> Vec2 {
-        self.0.iter().fold(Vec2::new(0.0, 0.0), |old_size, c| {
+        if !self.3 {return self.2;}
+
+        let size = self.0.iter().fold(Vec2::new(0.0, 0.0), |old_size, c| {
             let size = c.size(ctx);
-            let size = Vec2::new(min(size.x, c.1.x), min(size.y, c.1.y));
             let offset = c.offset(ctx);
             Vec2::new(max(old_size.x, offset.x+size.x), max(old_size.y, offset.y+size.y))
-        })
+        });
+        Vec2::new(min(size.x, self.2.x), min(size.y, self.2.y))
     }
 
     pub fn offset(&self, ctx: &Context) -> Vec2 {self.1}
 
-    pub fn draw(&self, ctx: &Context, canvas: &mut Canvas, mut window: Rect, offset: Vec2) {
+    pub fn draw(&self, ctx: &Context, canvas: &mut Canvas, window: Rect, offset: Vec2) {
+        let window = Rect::new(
+            max(window.x, window.x+self.1.x), max(window.y, window.y+self.1.y),//New window offset
+            min(window.w, self.2.x), min(window.h, self.2.y)//New window size
+        );
+
         for child in &self.0 {
-            window.x = max(window.x, window.x+self.1.x);
-            window.y = max(window.y, window.y+self.1.y);//New window offset
-            println!("C_offset: {:?}", self.1);
-            println!("C_win: {:?}", window);
-            println!("C_prev_off: {:?}", offset);
             child.draw(ctx, canvas, window, offset+self.1);
         }
     }

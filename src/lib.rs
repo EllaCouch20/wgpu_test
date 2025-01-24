@@ -47,7 +47,7 @@ impl EventHandler<GameError> for State {
         //window.w,h screen size
 
         //offset.x,y offset from top left of screen//Actual element offset
-        let page = self.0.build(ctx, window)?;
+        let page = self.0.build(ctx, window, false)?;
         println!("Page: {:#?}", page);
         page.draw(ctx, &mut canvas, window, offset);
 
